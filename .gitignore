@@ -1,0 +1,7 @@
+node_modules/
+outputs/
+scripts/
+.claude/
+.DS_Store
+*.py
+package*.json

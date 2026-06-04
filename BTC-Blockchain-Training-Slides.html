@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC/区块链 内部培训 — 完整讲义（幻灯片模式）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a2e;
+    --accent: #f7931a;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --purple: #8b5cf6;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 100;
+    background: rgba(18,18,26,0.9);
+    backdrop-filter: blur(20px);
+    padding: 8px 16px; border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .nav-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); border: none;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .nav-dot.active { background: var(--accent); box-shadow: 0 0 12px rgba(247,147,26,0.6); transform: scale(1.3); }
+  .nav-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text); width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.15); }
+  .nav-btn.fullscreen-btn { font-size: 14px; width: 32px; height: 32px; margin-left: 4px; }
+  .nav-btn.fullscreen-btn .fs-icon { display: inline; }
+  .nav-btn.fullscreen-btn .ex-icon { display: none; }
+  body.fullscreen .nav-btn.fullscreen-btn .fs-icon { display: none; }
+  body.fullscreen .nav-btn.fullscreen-btn .ex-icon { display: inline; }
+
+  .slides-container { width: 100vw; height: 100vh; position: relative; }
+  .slide {
+    position: absolute; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateX(40px);
+    transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none; padding: 36px 56px 72px;
+  }
+  .slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+  .slide.prev { opacity: 0; transform: translateX(-40px); }
+
+  .slide-inner {
+    max-width: 92vw; width: 100%; max-height: 93vh; overflow-y: auto;
+  }
+  .slide-inner::-webkit-scrollbar { width: 3px; }
+  .slide-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+  /* Title slide */
+  .title-slide { text-align: center; }
+  .title-slide .icon { font-size: 100px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+  .title-slide h1 {
+    font-size: 48px; font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), #f59e0b, #fbbf24);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+  .title-slide .subtitle { font-size: 20px; color: var(--text2); font-weight: 300; letter-spacing: 2px; }
+  .title-slide .meta { margin-top: 28px; font-size: 13px; color: var(--text3); }
+
+  /* Section header */
+  .section-tag {
+    display: inline-block; padding: 4px 16px; border-radius: 50px;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-title { font-size: 34px; font-weight: 800; margin-bottom: 4px; }
+  .section-subtitle { font-size: 15px; color: var(--text2); margin-bottom: 22px; }
+
+  /* Cards */
+  .card-grid { display: grid; gap: 14px; margin: 12px 0; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .card {
+    background: var(--card); border-radius: 12px; padding: 20px 22px;
+    border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden;
+  }
+  .card.ca { border-left: 3px solid var(--accent); }
+  .card.cb { border-left: 3px solid var(--blue); }
+  .card.cg { border-left: 3px solid var(--green); }
+  .card.cp { border-left: 3px solid var(--purple); }
+  .card.cr { border-left: 3px solid var(--red); }
+  .card h4 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .card p, .card li { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .card-icon { font-size: 24px; margin-bottom: 6px; }
+
+  /* Box styles */
+  .analogy, .warning, .keypoint {
+    border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 12px 0; font-size: 13px;
+  }
+  .analogy { background: rgba(59,130,246,0.1); border-left: 3px solid var(--blue); }
+  .warning { background: rgba(239,68,68,0.1); border-left: 3px solid var(--red); }
+  .keypoint { background: rgba(247,147,26,0.08); border-left: 3px solid var(--accent); }
+  .analogy .lbl, .warning .lbl, .keypoint .lbl { font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 2px; }
+  .analogy .lbl { color: var(--blue); }
+  .warning .lbl { color: var(--red); }
+  .keypoint .lbl { color: var(--accent); }
+
+  /* Tables */
+  table {
+    width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px;
+    border-radius: 8px; overflow: hidden;
+  }
+  th { background: rgba(247,147,26,0.15); padding: 11px 14px; text-align: left; font-weight: 700; color: var(--accent); }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text2); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Flow */
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
+  .flow-box { background: var(--card); border-radius: 10px; padding: 14px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.08); font-size: 13px; font-weight: 600; }
+  .flow-arrow { font-size: 20px; color: var(--text3); }
+
+  /* Code */
+  pre { background: rgba(0,0,0,0.35); padding: 12px 16px; border-radius: 8px; overflow-x: auto; font-family: 'SF Mono', monospace; font-size: 11px; line-height: 1.6; margin: 8px 0; border: 1px solid rgba(255,255,255,0.05); }
+  code { background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono', monospace; font-size: 11px; }
+
+  /* Divider slide */
+  .divider { text-align: center; }
+  .divider .num { font-size: 100px; font-weight: 900; margin-bottom: 8px; }
+  .divider .title { font-size: 32px; font-weight: 800; margin-bottom: 6px; }
+  .divider .sub { font-size: 16px; color: var(--text2); font-weight: 300; }
+  .divider .line { width: 80px; height: 3px; margin: 20px auto 0; border-radius: 2px; }
+
+  /* Stat */
+  .stat-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
+  .stat { background: var(--card); border-radius: 12px; padding: 18px 24px; text-align: center; border: 1px solid rgba(255,255,255,0.06); min-width: 130px; }
+  .stat .val { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, var(--accent), #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .stat .lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  .toc-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; margin: 4px 0; cursor: default; font-size: 13px; }
+  .toc-item:hover { background: rgba(255,255,255,0.03); }
+  .toc-ch { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
+
+  @media (max-width: 768px) {
+    .slide { padding: 20px 16px 70px; }
+    .slide-inner { max-width: 100vw; }
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    .title-slide h1 { font-size: 28px; }
+    .section-title { font-size: 24px; }
+    table { font-size: 11px; }
+    .card h4 { font-size: 14px; }
+    .card p, .card li { font-size: 12px; }
+  }
+
+  @media print {
+    body { overflow: visible; height: auto; }
+    .slides-container { position: static; }
+    .slide { position: static; opacity: 1; transform: none; page-break-after: always; min-height: 100vh; }
+    .nav-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-bar" id="navBar">
+  <button class="nav-btn" onclick="prevSlide()" title="上一页 (←)">◀</button>
+  <div id="navDots"></div>
+  <span class="nav-page" id="pageNum">1 / 65</span>
+  <button class="nav-btn" onclick="nextSlide()" title="下一页 (→)">▶</button>
+  <button class="nav-btn fullscreen-btn" onclick="toggleFullscreen()" title="全屏 (F)">
+    <span class="fs-icon">⛶</span><span class="ex-icon">✕</span>
+  </button>
+</div>
+
+<div class="slides-container" id="slidesContainer">
+
+<!-- ========== SLIDE 1: 封面 ========== -->
+<div class="slide active"><div class="slide-inner title-slide">
+  <div class="icon">₿</div>
+  <h1>比特币 & 区块链 内部培训</h1>
+  <div class="subtitle">从密码朋克到数字文明 — 完整的技术、经济与行业指南</div>
+  <div class="meta">2026年6月 · 仅供内部培训使用 · 不构成投资建议</div>
+</div></div>
+
+<!-- ========== SLIDE 2: 目录 ========== -->
+<div class="slide"><div class="slide-inner">
+  <div style="text-align:center;margin-bottom:20px;">
+    <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">OVERVIEW</span>
+    <div class="section-title">内容概览</div>
+    <div class="section-subtitle">8 个章节，从历史到未来构建完整知识框架</div>
+  </div>
+  <div class="g3 card-grid" style="margin-top:12px;">
+    <div class="card ca"><div class="card-icon">📜</div><h4>第 1 章 · 历史脉络</h4><p>密码朋克运动→白皮书→减半周期→ETF→Ordinals生态</p></div>
+    <div class="card cb"><div class="card-icon">⚙️</div><h4>第 2-3 章 · 原理与技术</h4><p>哈希/签名/UTXO/PoW——BTC底层机制完整拆解</p></div>
+    <div class="card cg"><div class="card-icon">🔗</div><h4>第 4-5 章 · 架构与版图</h4><p>六层架构、共识机制、L1/L2、DeFi行业全景</p></div>
+    <div class="card cp"><div class="card-icon">📊</div><h4>第 6 章 · 专题深入</h4><p>稳定币机制/DeFi风险/ETF机构化/AI对矿业的影响</p></div>
+    <div class="card cr"><div class="card-icon">🛡️</div><h4>第 7 章 · 风险与监管</h4><p>五层风险框架、全球监管对比、独立研究检查清单</p></div>
+    <div class="card ca"><div class="card-icon">🔮</div><h4>第 8 章 · 未来趋势</h4><p>BTC长期叙事、五个确定性趋势、AI经济与矿业融合</p></div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 3: 学习路线 ========== -->
+<div class="slide"><div class="slide-inner">
+  <div style="text-align:center;margin-bottom:20px;">
+    <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 0 · 开场</span>
+    <div class="section-title">为什么公司需要理解 BTC/区块链？</div>
+  </div>
+  <div class="g3 card-grid">
+    <div class="card cb"><div class="card-icon">🔧</div><h4>理解技术趋势</h4><p>区块链是价值互联网的基础协议。就像1990年代理解TCP/IP一样，理解区块链的底层逻辑对技术从业者至关重要。</p></div>
+    <div class="card cg"><div class="card-icon">📊</div><h4>理解行业变革</h4><p>DeFi、稳定币、RWA、ETF正在重塑金融基础设施。无论公司业务是否涉及加密，这些变革都会间接影响行业格局。</p></div>
+    <div class="card cp"><div class="card-icon">🛡️</div><h4>理解风险</h4><p>AI时代更需要可验证的稀缺资产、数字身份和链上证明。理解这些概念有助于未来的业务决策。</p></div>
+  </div>
+  <div style="margin-top:16px;text-align:center;">
+    <p style="font-size:13px;color:var(--text2);">学习路径：为什么出现 → 怎么运转 → 行业版图 → 风险与未来</p>
+    <div class="flow" style="font-size:11px;margin-top:8px;">
+      <div class="flow-box">第1章<br>历史</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第2章<br>问题</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第3章<br>BTC原理</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第4章<br>架构</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第5章<br>版图</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第6章<br>专题</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第7章<br>风险</div><span class="flow-arrow">→</span>
+      <div class="flow-box">第8章<br>未来</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 4: Ch1 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--accent);">01</div>
+  <div class="title">历史脉络</div>
+  <div class="sub">从密码朋克的幻想到全球金融基础设施 — Bitcoin 不是凭空诞生的</div>
+  <div class="line" style="background:var(--accent);"></div>
+</div></div>
+
+<!-- ========== SLIDE 5: 密码朋克运动 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <div class="section-title">密码朋克运动与电子现金梦想</div>
+  <div class="section-subtitle">1980s-2008 · Bitcoin 是数十年思想和技术的集大成者</div>
+  <p style="font-size:13px;color:var(--text2);line-height:1.8;">密码朋克（Cypherpunk）运动始于1980年代末，核心理念：<strong>用密码学保护隐私，用技术实现自由。</strong>1993年Eric Hughes发表《密码朋克宣言》："隐私是电子时代开放社会的必要条件。"</p>
+  <div class="flow" style="font-size:10px;">
+    <div class="flow-box">1976<br>Diffie-Hellman<br>公钥密码学</div><span class="flow-arrow">→</span>
+    <div class="flow-box">1983<br>Chaum eCash<br>盲签名电子现金</div><span class="flow-arrow">→</span>
+    <div class="flow-box">1991<br>PGP 发布<br>邮件加密</div><span class="flow-arrow">→</span>
+    <div class="flow-box">1993<br>密码朋克宣言<br>隐私 = 权利</div><span class="flow-arrow">→</span>
+    <div class="flow-box">1997<br>Hashcash (PoW)<br>Adam Back</div><span class="flow-arrow">→</span>
+    <div class="flow-box">1998<br>b-money<br>Bit Gold</div>
+  </div>
+  <div class="keypoint"><div class="lbl">🔑 关键洞察</div>中本聪的创新不在于发明了哈希、签名、PoW或P2P网络这些单个技术，而是<strong>把这些技术组合成了一个自洽的、可持续运行的系统</strong>。</div>
+</div></div>
+
+<!-- ========== SLIDE 6: 早期电子现金方案 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <div class="section-title">早期电子现金方案：为什么都失败了？</div>
+  <table>
+    <tr><th style="width:18%">方案</th><th style="width:10%">年份</th><th style="width:28%">核心创新</th><th style="width:44%">遗留问题</th></tr>
+    <tr>
+      <td><strong>eCash (DigiCash)</strong><br>David Chaum</td>
+      <td>1983-1998</td>
+      <td>盲签名实现隐私支付，银行看不到「谁在付钱给谁」</td>
+      <td>依赖中心化服务器；DigiCash公司1998年破产——中心化单点故障</td>
+    </tr>
+    <tr>
+      <td><strong>Hashcash</strong><br>Adam Back</td>
+      <td>1997</td>
+      <td>PoW工作量证明：用计算成本防垃圾邮件</td>
+      <td>每个PoW只能验证一次（不能转让），无法形成货币</td>
+    </tr>
+    <tr>
+      <td><strong>b-money</strong><br>Wei Dai</td>
+      <td>1998</td>
+      <td>第一个提出「去中心化账本+PoW铸币」的组合设计</td>
+      <td>只有理论框架，缺少具体实现和Sybil防御</td>
+    </tr>
+    <tr>
+      <td><strong>Bit Gold</strong><br>Nick Szabo</td>
+      <td>1998-2005</td>
+      <td>最接近Bitcoin的设计——PoW链+时间戳+稀缺性</td>
+      <td>缺少难度调整算法；无法稳定出块；双花验证未解决</td>
+    </tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 7: 比特币诞生 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <div class="section-title">2008-2009：比特币的诞生</div>
+  <div class="g2 card-grid">
+    <div class="card ca"><h4>📄 白皮书发布 · 2008.10.31</h4><p>中本聪在密码学邮件列表发布《Bitcoin: A Peer-to-Peer Electronic Cash System》，仅9页引用8篇文献。核心创新：P2P网络+PoW+最长链规则。</p></div>
+    <div class="card ca"><h4>⛏️ 创世区块 · 2009.1.3</h4><p>区块#0被挖出，Coinbase嵌入泰晤士报标题。既是政治声明（对银行救助的抗议），也是时间戳证明——表明该区块不可能在2009.1.3之前创建。</p></div>
+  </div>
+  <table style="margin-top:10px;">
+    <tr><th style="width:18%">日期</th><th style="width:42%">事件</th><th style="width:40%">意义</th></tr>
+    <tr><td>2009.1.9</td><td>Bitcoin v0.1 发布</td><td>第一个比特币客户端软件</td></tr>
+    <tr><td>2009.1.12</td><td>第一笔BTC交易（中本聪→Hal Finney）</td><td>10 BTC，证明系统可用</td></tr>
+    <tr><td>2010.5.22</td><td>比特币披萨日</td><td>10,000 BTC买两份披萨，首次实物交易</td></tr>
+    <tr><td>2010.7</td><td>Mt.Gox 交易所成立</td><td>后来成为最大教训——850K BTC被盗</td></tr>
+    <tr><td>2010.12</td><td>中本聪消失</td><td>最后一条公开消息后彻底消失，身份至今成谜</td></tr>
+    <tr><td>2011.2</td><td>BTC首次达到1美元</td><td>从0到$1，走了两年</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 8: 减半周期 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <div class="section-title">历次减半周期与行业演进</div>
+  <table>
+    <tr><th style="width:12%">减半</th><th style="width:14%">日期</th><th style="width:18%">奖励变化</th><th style="width:56%">后续行业发展</th></tr>
+    <tr><td>第1次</td><td>2012.11</td><td>50→25 BTC</td><td>Mt.Gox崩溃，ASIC矿机出现，BTC首次进入主流媒体视野</td></tr>
+    <tr><td>第2次</td><td>2016.7</td><td>25→12.5 BTC</td><td>Ethereum上线，ICO狂潮，SegWit升级，BCH分叉</td></tr>
+    <tr><td>第3次</td><td>2020.5</td><td>12.5→6.25 BTC</td><td>DeFi Summer，NFT爆发，机构入场(MicroStrategy/Tesla)，萨尔瓦多法定货币</td></tr>
+    <tr><td>第4次</td><td>2024.4</td><td>6.25→3.125 BTC</td><td>Ordinals铭文/BRC-20/Runes，比特币L2生态，AI矿业融合，ETF时代</td></tr>
+  </table>
+  <div class="warning"><div class="lbl">⚠️ 注意</div>仅有3次减半后的完整价格数据——这是一个极小的样本量。<strong>历史表现不代表未来结果。</strong>减半与价格之间的关系受宏观流动性、监管政策、市场情绪等多重因素影响。</div>
+</div></div>
+
+<!-- ========== SLIDE 9: 2024 ETF & Halving ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <div class="section-title">2024：现货BTC ETF获批与第四次减半</div>
+  <div class="g2 card-grid" style="margin-bottom:14px;">
+    <div class="card ca"><h4>🏛️ 现货BTC ETF获批 (2024.1.10)</h4><p>SEC批准11支比特币现货ETF。BlackRock IBIT、Fidelity FBTC等。首个交易日交易量超$4.6B。<br><strong>意义：</strong>传统金融账户可合规配置BTC；大幅降低购买门槛；百亿美元级增量资金；BTC进入主流资产配置。</p></div>
+    <div class="card cb"><h4>⛏️ 第四次减半 + 生态大爆发</h4><p>区块奖励降至3.125 BTC。同时比特币生态创新爆发：Ordinals铭文（数据铭刻到单个satoshi）、BRC-20比特币同质化代币标准、Runes符文协议（减半同日上线）、BitVM（比特币ZK Rollup验证）。</p></div>
+  </div>
+  <div class="keypoint"><div class="lbl">🔑 ETF改变了什么？</div>ETF<strong>改变了资金入口</strong>，但不改变Bitcoin协议本身——2100万上限不变，出块时间不变，共识机制不变。ETF是一个「包装层」，让传统金融可以合规接入BTC。就像与世隔绝的村子修了高速公路——村子没变，进来的人多了。</div>
+</div></div>
+
+<!-- ========== SLIDE 10: Ch2 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--blue);">02</div>
+  <div class="title">Bitcoin 解决了什么问题</div>
+  <div class="sub">双花、可信第三方、去中心化账本 — 理解「为什么需要BTC」</div>
+  <div class="line" style="background:var(--blue);"></div>
+</div></div>
+
+<!-- ========== SLIDE 11: 双花问题 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 2 · PROBLEMS</span>
+  <div class="section-title">双花问题：数字时代的「一张钞票付两次」</div>
+  <div class="g2 card-grid">
+    <div class="card cb">
+      <h4>💡 通俗类比</h4>
+      <p>你有一张数字图片，发给朋友A一份，再发给B一份——两人都拿到了「原图」。数字文件天然可复制。</p>
+      <p style="margin-top:8px;">如果数字货币只是一串数字签名，怎么保证它不被复制和重复使用？传统方案：找银行维护中心化账本——但你必须<strong>信任银行</strong>。</p>
+    </div>
+    <div class="card cb">
+      <h4>🔐 中本聪的解法</h4>
+      <p>① 公开广播所有交易（全网可见）<br>② PoW竞争记账（谁可以打包）<br>③ 最长链规则（哪条链有效）<br>④ 全网节点独立验证</p>
+      <p style="margin-top:8px;">任何UTXO只要在最长链上被花过一次，后续消费尝试都会被直接拒绝。<strong>不需要可信第三方。</strong></p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 12: 信任问题 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 2 · PROBLEMS</span>
+  <div class="section-title">可信第三方问题 & 去中心化账本</div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:8px;">传统金融建立在三层信任之上，每一层都可能出问题。Bitcoin的设计理念：<strong>Don't trust, verify.</strong>（不要信任，要验证）</p>
+  <table>
+    <tr><th>信任层</th><th>信任什么</th><th>风险</th><th>历史教训</th></tr>
+    <tr><td>信任银行</td><td>银行不挪用存款</td><td>部分准备金制度</td><td>2008年金融危机</td></tr>
+    <tr><td>信任审查</td><td>账户不被无故冻结</td><td>中心化机构单方面冻结</td><td>2022加拿大自由车队事件</td></tr>
+    <tr><td>信任货币政策</td><td>央行不过度印钞</td><td>增发→购买力稀释</td><td>2008后全球量化宽松</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:10px;"><div class="lbl">🔑 Bitcoin的设计组合 = 四个模块</div>① P2P网络（广播交易和区块）→ ② 数字签名（证明所有权）→ ③ PoW工作量证明（谁可以打包）→ ④ 全节点独立验证（全网审计）。四个模块缺一不可，去掉可信第三方，用数学和经济激励替代。</div>
+</div></div>
+
+<!-- ========== SLIDE 13: Ch3 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--green);">03</div>
+  <div class="title">BTC 技术原理</div>
+  <div class="sub">哈希→签名→UTXO→PoW→挖矿→减半 — Bitcoin底层机制完整拆解</div>
+  <div class="line" style="background:var(--green);"></div>
+</div></div>
+
+<!-- ========== SLIDE 14: 哈希函数 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">哈希函数 SHA-256：区块链的基石</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>💡 数字世界的「文件指纹」</h4>
+      <p>像人的指纹——独一无二、无法从指纹反推外貌、微小变化导致完全不同指纹。SHA-256：任意长度输入→固定256位输出。</p>
+    </div>
+    <div class="card cg">
+      <h4>🎯 五大特性</h4>
+      <p>① 确定性——同一输入永远同一输出<br>② 单向性——从输出无法反推输入<br>③ 雪崩效应——改1bit，输出约50%翻转<br>④ 碰撞抵抗——无法找到两输入产生相同输出<br>⑤ 快速计算——每秒数百万次，反向不可能</p>
+    </div>
+  </div>
+  <pre>SHA256("Hello") = 185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969
+SHA256("hello") = 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+<span style="color:#64748b;"># 仅一个字母大小写不同 → 输出完全不同（雪崩效应）</span></pre>
+  <p style="font-size:12px;color:var(--text2);margin-top:8px;"><strong>在BTC中的应用：</strong>区块哈希 | 工作量证明(PoW) | 链式结构(前区块哈希) | 默克尔树 | 地址生成(公钥→SHA256→RIPEMD160→地址)</p>
+</div></div>
+
+<!-- ========== SLIDE 15: 默克尔树 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">默克尔树 (Merkle Tree)：几千笔交易压缩为32字节</div>
+  <pre style="text-align:center;">             Merkle Root (H_ABCD)
+            /                    \
+        H_AB                      H_CD
+       /    \                    /    \
+    H_A      H_B              H_C      H_D
+     ↑        ↑                ↑        ↑
+   TxA      TxB              TxC      TxD</pre>
+  <p style="font-size:12px;color:var(--text2);line-height:1.8;">默克尔树 = 树形哈希结构，将区块内所有交易两两哈希，逐层向上，最终汇总为32字节的默克尔根。默克尔根存于区块头中。</p>
+  <p style="font-size:12px;color:var(--text2);"><strong>SPV轻节点验证：</strong>轻钱包只需下载区块头（80字节/区块），用默克尔路径即可验证某笔交易是否在区块中——不需要下载完整区块（1-4MB）。这是轻钱包、Rollup数据压缩、Lightning支付验证的核心原理。</p>
+</div></div>
+
+<!-- ========== SLIDE 16: 私钥/公钥/地址 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">私钥、公钥、地址：三位一体的身份系统</div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:8px;">ECDSA（椭圆曲线数字签名算法）· secp256k1曲线 · 私钥k → 公钥K = k × G（G=生成点）</p>
+  <div class="flow">
+    <div class="flow-box">私钥 k<br><small>256位随机数<br>绝对保密</small></div><span class="flow-arrow">→</span>
+    <div class="flow-box">椭圆曲线乘法<br><small>K = k × G</small></div><span class="flow-arrow">→</span>
+    <div class="flow-box">SHA256+<br>RIPEMD160</div><span class="flow-arrow">→</span>
+    <div class="flow-box">Base58Check<br>编码<br><small>BTC地址</small></div>
+  </div>
+  <div class="g2 card-grid">
+    <div class="card cg"><h4>🔑 核心安全属性</h4><p>私钥→公钥 容易（一次椭圆曲线乘法）<br>公钥→私钥 计算上不可能（离散对数问题）<br>私钥空间 2^256 ≈ 10^77<br>💡 私钥=签名印章 | 公钥=验章工具 | 地址=收件信箱</p></div>
+    <div class="card cr"><h4>⚠️ 绝对重要的安全警告</h4><p>私钥 = 钱。谁有私钥谁就有所有权。<br>没有密码找回，没有客服可以帮你重置。<br>丢失私钥 = 永久丢失资产。<br>据估计15-20% BTC已永久丢失。</p></div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 17: 钱包 & 签名 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">数字签名与钱包：钱包不存钱，钱包存密钥</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>✍️ 数字签名流程</h4>
+      <p>① Alice钱包选择UTXO，构造交易数据<br>② 用<strong>私钥</strong>对交易哈希生成签名（ECDSA）<br>③ 交易+签名广播到全网<br>④ 任何节点用Alice<strong>公钥</strong>验证：签名确实来自Alice私钥✓ 交易未被篡改✓</p>
+      <p style="margin-top:6px;">核心：密码学替代银行授权验证——不需要信任任何人。</p>
+    </div>
+    <div class="card cg">
+      <h4>🔐 HD钱包 (BIP32/39/44)</h4>
+      <p>助记词(12/24个单词)→种子(512位)→主私钥→几乎无限个子私钥和地址</p>
+      <p style="margin-top:6px;">一条助记词管理所有地址。备份一次即可。</p>
+      <p style="margin-top:6px;">💡 <strong>钱包是Key Manager</strong>，不是「存钱」的地方。比特币只存在于区块链这个去中心化账本上。</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 18: UTXO ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 3 · TECH</span>
+  <div class="section-title">⚠️ UTXO模型：Bitcoin没有「账户余额」！</div>
+  <div class="warning"><div class="lbl">⚠️ 最容易犯的错误</div>Bitcoin <strong>没有「账户余额」概念</strong>。你的「余额」是你所有未花费的UTXO（Unspent Transaction Output）的总和。这和银行账户模型是完全不同的两种设计。</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>💡 现金纸币和找零</h4>
+      <p>钱包里有不同面额纸钞：0.5 BTC、0.3 BTC、0.1 BTC。每张纸钞就是一个UTXO。</p>
+      <p style="margin-top:6px;">要付0.7 BTC：拿出0.5+0.3两张→付给收款人0.7→找零0.098→矿工费0.002。找零是一张「新钞票」（新UTXO），回到你的地址。</p>
+      <p style="margin-top:6px;">你不需要「余额」概念——只需要看钱包里有哪些面额的UTXO，凑够金额付出去。</p>
+    </div>
+    <div class="card cg">
+      <h4>✅ UTXO模型优势</h4>
+      <p>• 并行处理——不同UTXO之间完全独立<br>• 隐私——每次用新地址，比账户模型难追踪<br>• 防双花天然——每个UTXO消费后永久失效<br>• 可审计性——每个UTXO可追溯到Coinbase交易</p>
+      <pre style="margin-top:8px;">Input UTXO1(0.5) + UTXO2(0.3)
+→ Out1(0.7→Bob) + Out2(0.098→找零)
+手续费 = (0.5+0.3)-(0.7+0.098) = 0.002 BTC</pre>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 19: 交易结构 & Mempool ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">交易结构与Mempool</div>
+  <table>
+    <tr><th style="width:22%">组件</th><th>说明</th></tr>
+    <tr><td><strong>Inputs（输入）</strong></td><td>引用已有UTXO：前交易哈希+输出索引+解锁脚本（签名+公钥）——「钱从哪来」</td></tr>
+    <tr><td><strong>Outputs（输出）</strong></td><td>创建新UTXO：金额+锁定脚本（收款方地址条件）——「钱到哪去」</td></tr>
+    <tr><td><strong>⚠️ 手续费</strong></td><td>没有「手续费」字段！手续费 = Σ输入 - Σ输出。找零必须显式创建，否则余额全归矿工！</td></tr>
+    <tr><td><strong>Mempool</strong></td><td>已广播但未确认交易的暂存区。矿工按手续费率(sat/vByte)从高到低选择交易打包。</td></tr>
+  </table>
+  <div class="keypoint"><div class="lbl">🔑 关键</div>「没有手续费字段，手续费是输入减输出的差值」——这是面试高频问题。找零必须显式创建——链上没有任何「自动找零」机制。不创建找零输出→剩余BTC全部成为矿工费！</div>
+</div></div>
+
+<!-- ========== SLIDE 20: 区块结构 & PoW ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">区块结构与PoW挖矿过程</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>📦 区块结构（区块头80字节+区块体）</h4>
+      <table style="font-size:10px;">
+        <tr><td>版本号</td><td>4 Bytes</td></tr>
+        <tr><td>前区块哈希</td><td>32 Bytes</td></tr>
+        <tr><td>默克尔根</td><td>32 Bytes</td></tr>
+        <tr><td>时间戳</td><td>4 Bytes</td></tr>
+        <tr><td>难度目标(bits)</td><td>4 Bytes</td></tr>
+        <tr><td>Nonce</td><td>4 Bytes</td></tr>
+        <tr><td colspan="2"><strong>Coinbase交易 + N笔普通交易</strong></td></tr>
+      </table>
+    </div>
+    <div class="card cg">
+      <h4>⛏️ PoW挖矿 = 昂贵的公开抽签</h4>
+      <p>矿工不断改变Nonce，计算SHA256(SHA256(区块头))，检查哈希值是否小于难度目标。</p>
+      <p style="margin-top:6px;">不满足→继续尝试（全网每秒数万亿次）<br>满足→广播区块，获得奖励。</p>
+      <p style="margin-top:6px;"><strong>Coinbase交易的特殊性：</strong>每个区块的第一笔交易——创币交易。没有输入，输出是矿工地址。所有2100万BTC都诞生于Coinbase交易。</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 21: 难度、确认数、51%攻击 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">难度调整、确认数与51%攻击</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>📐 难度调整</h4><p>每2016个区块（约2周）自动调整。<br>新难度 = 旧难度 × (实际2016块用时/20160分钟)<br>约束：单次调整≤4倍<br><br>保证无论全网算力如何变化，BTC始终约10分钟出一个块。即使大量矿工退出（如中国2021禁令），网络自动恢复。</p>
+    </div>
+    <div class="card cg">
+      <h4>🔢 确认数与概率最终性</h4><p>1确认 = 交易刚被埋进一个区块<br>6确认 = 上面堆了6个区块<br><br>Bitcoin<strong>没有绝对最终性</strong>——理论上任何交易都可被更长的分叉回滚。但6确认后回滚成本已高到不经济。概率最终性：随确认数增加，回滚概率指数级下降。</p>
+    </div>
+  </div>
+  <div class="card cr" style="margin-top:10px;">
+    <h4>🔴 51%攻击：能做 vs 不能做</h4>
+    <p><strong>能做：</strong>① 双花（创建秘密分叉回滚自己的交易）② 选择性审查（拒绝打包特定交易）<br>
+    <strong>不能做：</strong>① 偷别人的币（没有私钥）② 凭空创造BTC（全节点会拒绝）③ 改变2100万上限（需硬分叉+社区共识）<br>
+    <strong>博弈论是最后防线：</strong>拥有51%算力的人诚实挖矿赚得比攻击多。但若攻击者不是理性的经济参与者（如国家行为者），博弈论不适用——这是开放问题。</p>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 22: 全节点 vs 矿工 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">全节点 vs 矿工：两个最容易混淆的角色</div>
+  <table>
+    <tr><th style="width:12%"></th><th style="width:30%">全节点 (Full Node)</th><th style="width:30%">矿工 (Miner)</th><th style="width:28%">关键差异</th></tr>
+    <tr><td><strong>功能</strong></td><td>下载并验证所有区块和交易，执行全部共识规则</td><td>投入算力参与PoW竞争，打包交易进区块</td><td>审计员 vs 记账员</td></tr>
+    <tr><td><strong>收益</strong></td><td>无直接收益（自愿运行）</td><td>区块奖励 + 手续费</td><td>有收益 vs 无收益</td></tr>
+    <tr><td><strong>权力</strong></td><td><strong>最终裁判</strong>——拒绝不合规区块/交易</td><td>交易排序权——选择哪些交易进区块</td><td>节点拥有最终决定权</td></tr>
+    <tr><td><strong>案例</strong></td><td>2017 SegWit2x矿工90%支持扩容，但全节点社区反对→矿工让步</td><td>矿工如不按规则打包，全节点无视他们</td><td>全节点通过选择软件版本控制共识规则</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:10px;"><div class="lbl">🔑 关键认知</div>「矿工控制Bitcoin」是常见误区。<strong>全节点是网络的最终裁判</strong>——全节点通过选择运行哪个版本的软件来控制共识规则。矿工只是提供服务（打包），如果不按规则打包，全节点会拒绝他们的区块，他们的工作就毫无价值。</div>
+</div></div>
+
+<!-- ========== SLIDE 23: 2100万 & 减半 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">2100万上限与减半机制</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>📉 2100万怎么来的？</h4><p>数学推导：Σ(210,000 × 50/2^i) for i=0→∞ = 21,000,000<br>由于整数精度截断，实际≈20,999,999.9769 BTC<br>2140年左右，区块奖励<1 satoshi，实际上停止增发。<br><br>能否改变？可以——通过硬分叉。但硬分叉后的链不再是原Bitcoin，每次改变2100万的提案都未获得共识。</p>
+    </div>
+    <div class="card cg">
+      <h4>🔮 长期安全预算问题</h4><p>区块奖励不断减半→趋近于0→矿工收入越来越依赖手续费。<br><br><strong>乐观：</strong>Layer 2大批量交易+L1高价值结算产生充足手续费<br><strong>悲观：</strong>低交易量下算力下降可能威胁安全<br><br>这是Bitcoin社区最大的开放问题之一——目前没有共识答案。</p>
+    </div>
+  </div>
+  <table style="margin-top:10px;">
+    <tr><th>时期</th><th>区块奖励</th><th>累计产出</th><th>通胀率(年化)</th></tr>
+    <tr><td>2009-2012</td><td>50 BTC</td><td>1050万</td><td>~25%→~12.5%</td></tr>
+    <tr><td>2012-2016</td><td>25 BTC</td><td>1575万</td><td>~12.5%→~4.2%</td></tr>
+    <tr><td>2016-2020</td><td>12.5 BTC</td><td>1837.5万</td><td>~4.2%→~1.8%</td></tr>
+    <tr><td>2020-2024</td><td>6.25 BTC</td><td>1968.75万</td><td>~1.8%→~0.85%</td></tr>
+    <tr><td>2024-2028</td><td style="color:var(--accent);">3.125 BTC</td><td>~2034万</td><td>~0.85%→~0.4%</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 24: Taproot & 交易生命周期 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">Taproot升级(2021) & BTC交易完整生命周期</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>🌿 Taproot升级 · 2021.11</h4><p>Bitcoin近年来最重要的协议改进：<br>① <strong>Schnorr签名</strong>替代ECDSA——多签交易大小与单签相同<br>② <strong>MAST</strong>——复杂脚本只暴露被执行分支<br>③ <strong>Tapscript</strong>——更灵活的脚本语言<br><br>为Lightning、多签、Ordinals铭文提供了更好的基础层。</p>
+    </div>
+    <div class="card cg">
+      <h4>🔄 一笔BTC交易的完整生命周期</h4><p style="font-size:11px;">① 选择UTXO→② 构造交易→③ 私钥签名→④ 广播P2P网络→⑤ 进入Mempool→⑥ 矿工打包→⑦ PoW不断试Nonce→⑧ 找到有效哈希→⑨ 广播区块→⑩ 全节点逐条验证→⑪ 加入本地区块链→⑫ Bob看到1确认→⑬ 6确认「最终」</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 25: BTC 原理总结 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 3 · TECH</span>
+  <div class="section-title">BTC技术原理总结 & 常见误区纠正</div>
+  <div class="flow" style="margin-bottom:16px;">
+    <div class="flow-box">密码学层<br><small>SHA-256/ECDSA</small></div><span class="flow-arrow">→</span>
+    <div class="flow-box">数据层<br><small>UTXO/区块</small></div><span class="flow-arrow">→</span>
+    <div class="flow-box">网络层<br><small>P2P广播</small></div><span class="flow-arrow">→</span>
+    <div class="flow-box">共识层<br><small>PoW/最长链</small></div><span class="flow-arrow">→</span>
+    <div class="flow-box">经济层<br><small>减半/手续费</small></div>
+  </div>
+  <table>
+    <tr><th style="width:35%">常见误区</th><th style="width:65%">正确理解</th></tr>
+    <tr><td>BTC是匿名的</td><td>伪匿名——所有交易公开可查，可被链上分析追踪</td></tr>
+    <tr><td>BTC账户有余额</td><td>UTXO模型，没有账户概念</td></tr>
+    <tr><td>矿工控制Bitcoin</td><td>全节点通过选择软件版本执行共识规则</td></tr>
+    <tr><td>BTC交易完全不可逆</td><td>概率最终性——0确认可被RBF替换</td></tr>
+    <tr><td>BTC太慢了</td><td>L1约7 TPS，但Lightning已支持秒级、近乎零手续费的微支付</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 26: Ch4 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--purple);">04</div>
+  <div class="title">区块链通用架构</div>
+  <div class="sub">六层架构 · 共识机制 · 智能合约 · L1/L2 · 预言机与桥</div>
+  <div class="line" style="background:var(--purple);"></div>
+</div></div>
+
+<!-- ========== SLIDE 27: 区块链定义与分层 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(139,92,246,0.15);color:var(--purple);">PART 4 · ARCHITECTURE</span>
+  <div class="section-title">区块链是什么？六层通用架构</div>
+  <table>
+    <tr><th style="width:15%">层级</th><th style="width:22%">核心</th><th style="width:63%">功能与特性</th></tr>
+    <tr><td>① 数据层</td><td>区块+链+默克尔树</td><td>仅追加、不可删改的数据结构</td></tr>
+    <tr><td>② 网络层</td><td>P2P组网+广播</td><td>交易和区块在全网节点间传播</td></tr>
+    <tr><td>③ 共识层</td><td>PoW / PoS / BFT</td><td>决定谁可以添加新区块——最核心的创新</td></tr>
+    <tr><td>④ 激励层</td><td>Token经济模型</td><td>发行+手续费分配——驱动诚实参与</td></tr>
+    <tr><td>⑤ 合约层</td><td>脚本 / EVM / WASM</td><td>BTC(非图灵完备) vs ETH(图灵完备EVM)</td></tr>
+    <tr><td>⑥ 应用层</td><td>DApp/钱包/浏览器</td><td>用户交互界面和服务</td></tr>
+  </table>
+  <div class="g2 card-grid" style="margin-top:12px;">
+    <div class="card cp"><h4>公链 (Public)</h4><p>任何人可参与，无许可。Bitcoin/Ethereum/Solana。适合：DeFi、全球支付。</p></div>
+    <div class="card cp"><h4>联盟链 (Consortium)</h4><p>授权组织参与，许可制。Hyperledger/R3 Corda。适合：供应链金融、银行间清算。</p></div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 28: 共识机制 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(139,92,246,0.15);color:var(--purple);">PART 4 · ARCHITECTURE</span>
+  <div class="section-title">共识机制三大家族：PoW vs PoS vs BFT</div>
+  <table>
+    <tr><th style="width:14%">维度</th><th style="width:28%">PoW (工作量证明)</th><th style="width:28%">PoS (权益证明)</th><th style="width:30%">BFT (拜占庭容错)</th></tr>
+    <tr><td><strong>安全根基</strong></td><td>物理能量（电力不可伪造）</td><td>经济资本（Token不可伪造）</td><td>节点信誉+多轮投票</td></tr>
+    <tr><td><strong>最终性</strong></td><td>概率性（确认越多越安全）</td><td>概率性→经济最终性</td><td>绝对最终性（确认即不可回滚）</td></tr>
+    <tr><td><strong>TPS</strong></td><td>低 (BTC ~7)</td><td>中 (ETH ~30)</td><td>高 (Tendermint ~4,000)</td></tr>
+    <tr><td><strong>能耗</strong></td><td>极高</td><td>极低</td><td>低</td></tr>
+    <tr><td><strong>去中心化</strong></td><td>高（任何人可挖）</td><td>较高（有富者愈富趋势）</td><td>低（节点数受限）</td></tr>
+    <tr><td><strong>代表</strong></td><td>BTC, LTC, DOGE</td><td>ETH, ADA, SOL</td><td>Cosmos, Near, Aptos</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:10px;"><div class="lbl">🔑 没有完美的共识机制</div>每种共识都是权衡。PoW安全根植于物理世界（电力不可伪造），PoS安全根植于经济学（资本不可伪造）。从15年实战检验看，PoW最经考验——BTC从未宕机。但PoS在节能和吞吐量上有明显优势。</div>
+</div></div>
+
+<!-- ========== SLIDE 29: 智能合约 & EVM & Token ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(139,92,246,0.15);color:var(--purple);">PART 4 · ARCHITECTURE</span>
+  <div class="section-title">智能合约、Token标准与EVM</div>
+  <div class="g2 card-grid">
+    <div class="card cp">
+      <h4>💡 智能合约 = 自动售货机</h4><p>投币（满足条件）→选择商品（执行逻辑）→自动出货（获得结果）。不需要店员（中介），规则透明（代码公开），不可干预（一旦部署无法停止）。</p>
+    </div>
+    <div class="card cp">
+      <h4>⚙️ EVM（以太坊虚拟机）</h4><p>Solidity→编译为EVM字节码→在EVM上执行。Gas：每步EVM操作消耗Gas，防无限循环（Gas耗尽自动停止）。所有EVM兼容链（BSC/Polygon/Arbitrum）共享同一套EVM。</p>
+    </div>
+  </div>
+  <table style="margin-top:10px;">
+    <tr><th style="width:18%">Token标准</th><th style="width:28%">类型</th><th style="width:54%">典型应用</th></tr>
+    <tr><td>ERC-20</td><td>同质化代币</td><td>USDT, USDC, UNI, LINK——transfer/approve/transferFrom</td></tr>
+    <tr><td>ERC-721</td><td>非同质化(NFT)</td><td>Bored Ape, CryptoPunks——每个Token ID唯一，不可互换</td></tr>
+    <tr><td>ERC-1155</td><td>多代币标准</td><td>游戏资产、门票——同一合约同时管理同质化和非同质化代币</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 30: L1/L2 & 扩容 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(139,92,246,0.15);color:var(--purple);">PART 4 · ARCHITECTURE</span>
+  <div class="section-title">L1/L2扩容方案对比</div>
+  <div class="keypoint" style="margin-bottom:12px;"><div class="lbl">🔑 区块链不可能三角</div>去中心化、安全、可扩展性——三者最多同时优化两个。BTC和ETH L1选择去中心化+安全，牺牲可扩展性。L2将大量交易放链下，L1只做最终结算。</div>
+  <table>
+    <tr><th style="width:22%">方案</th><th style="width:22%">类型</th><th style="width:28%">核心机制</th><th style="width:28%">性能特点</th></tr>
+    <tr><td><strong>Lightning Network</strong></td><td>状态通道 (BTC L2)</td><td>2-of-2多签通道，链下更新，HTLC路由</td><td>秒级、<$0.01、百万+TPS</td></tr>
+    <tr><td><strong>Optimism/Arbitrum</strong></td><td>Optimistic Rollup</td><td>乐观假设有效，7天挑战期（欺诈证明）</td><td>~4,000 TPS，提款需7天</td></tr>
+    <tr><td><strong>zkSync/StarkNet</strong></td><td>ZK Rollup</td><td>每批交易附带ZK有效性证明</td><td>~10,000 TPS，分钟级提款</td></tr>
+    <tr><td><strong>Polygon PoS</strong></td><td>侧链</td><td>独立PoS共识+检查点提交ETH</td><td>~7,000 TPS，安全性低于Rollup</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 31: 跨链桥 & 预言机 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(139,92,246,0.15);color:var(--purple);">PART 4 · ARCHITECTURE</span>
+  <div class="section-title">跨链桥与预言机：区块链最脆弱的环节</div>
+  <div class="g2 card-grid">
+    <div class="card cr">
+      <h4>🔗 跨链桥 (Bridge)</h4><p>资产跨链 = 源链锁定资产 + 目标链铸造映射代币。</p>
+      <p style="margin-top:6px;"><strong>⚠️ 加密史上被攻击最频繁的环节：</strong><br>• Ronin Bridge ($620M, 2022)<br>• Wormhole ($325M, 2022)<br>• Nomad ($190M, 2022)</p>
+      <p style="margin-top:6px;">Vitalik Buterin本人对跨链桥安全性持保留态度。</p>
+    </div>
+    <div class="card cp">
+      <h4>🔮 预言机 (Oracle)</h4><p>将链下数据（价格/天气/比分）送入链上合约。Chainlink是最大的预言机网络。</p>
+      <p style="margin-top:6px;">💡 = 把链下真实世界数据送进链上合约的<strong>信使</strong>。</p>
+      <p style="margin-top:6px;"><strong>风险：</strong>输入数据被操纵→合约执行错误逻辑→资金损失。预言机操纵是DeFi被攻击的主要原因之一。</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 32: Ch5 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--accent);">05</div>
+  <div class="title">行业版图</div>
+  <div class="sub">六层产业结构 · BTC/Ethereum/Alt L1 · DeFi/NFT/RWA · 基础设施</div>
+  <div class="line" style="background:var(--accent);"></div>
+</div></div>
+
+<!-- ========== SLIDE 33: 行业全景 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 5 · INDUSTRY</span>
+  <div class="section-title">行业全景：六层产业结构</div>
+  <table>
+    <tr><th style="width:18%">层级</th><th style="width:24%">功能</th><th style="width:58%">代表项目/公司</th></tr>
+    <tr><td>① 结算层/L1</td><td>最终结算、安全、价值存储</td><td>Bitcoin, Ethereum, Solana, BSC, Avalanche</td></tr>
+    <tr><td>② L2/扩容层</td><td>提升吞吐量、降低费用</td><td>Lightning, Arbitrum, Optimism, Base, zkSync</td></tr>
+    <tr><td>③ 中间件/基础设施</td><td>数据服务、互操作、存储</td><td>Chainlink, The Graph, IPFS/Filecoin</td></tr>
+    <tr><td>④ 金融层/DeFi</td><td>去中心化金融服务</td><td>Uniswap, Aave, Lido, EigenLayer</td></tr>
+    <tr><td>⑤ 资产层</td><td>价值载体和交换媒介</td><td>USDT, USDC, DAI, RWA代币</td></tr>
+    <tr><td>⑥ 应用层/用户入口</td><td>用户界面和服务</td><td>Binance, Coinbase, MetaMask, OpenSea</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 34: BTC vs ETH vs Alt L1 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 5 · INDUSTRY</span>
+  <div class="section-title">BTC：数字黄金 · Ethereum：世界计算机</div>
+  <div class="g2 card-grid">
+    <div class="card ca">
+      <h4>₿ BTC = 数字黄金</h4><p>定位：从「电子现金」→「数字黄金」和全球结算层<br>市值占比：~50% (BTC Dominance)<br>核心叙事：非主权、绝对稀缺(2100万)、最去中心化<br>局限：L1 ~7 TPS，不适合高频日常支付<br>日常支付→Lightning；复杂应用→Ethereum/L2</p>
+    </div>
+    <div class="card cb">
+      <h4>💎 Ethereum = 世界计算机</h4><p>定位：可编程的金融计算平台<br>最大DeFi生态TVL<br>2022合并(PoS)；2024 Dencun(EIP-4844 Blob降低L2费用)<br>路线图：以Rollup为中心，L1定位结算层&DA层<br>ETH = 「数字石油」——每笔交易都需ETH付Gas</p>
+    </div>
+  </div>
+  <table style="margin-top:10px;">
+    <tr><th>Alt L1</th><th>定位</th><th>技术特点</th><th>权衡</th></tr>
+    <tr><td>Solana</td><td>高性能L1</td><td>PoH+PoS, ~3,000 TPS, 低费率</td><td>用去中心化换性能</td></tr>
+    <tr><td>BSC</td><td>EVM低成本链</td><td>21验证者, EVM兼容</td><td>中心化程度较高</td></tr>
+    <tr><td>Avalanche</td><td>子网定制化</td><td>多链架构，子网独立共识</td><td>复杂度较高</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 35: 稳定币 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 5 · INDUSTRY</span>
+  <div class="section-title">稳定币：比特币之后最重要的加密创新</div>
+  <table>
+    <tr><th style="width:18%">类型</th><th style="width:24%">机制</th><th style="width:22%">代表</th><th style="width:36%">核心风险</th></tr>
+    <tr><td><strong>法币抵押型</strong></td><td>1:1持有美元/美债</td><td>USDT, USDC</td><td>储备是否真实？可被冻结；银行风险(SVB)</td></tr>
+    <tr><td><strong>超额抵押型</strong></td><td>存入$150 ETH→生成$100 DAI</td><td>DAI (MakerDAO)</td><td>抵押品暴跌+清算踩踏；预言机操纵</td></tr>
+    <tr><td><strong>算法型</strong></td><td>燃烧/铸造姐妹Token维持锚定</td><td>Terra/UST (已崩盘)</td><td>死亡螺旋归零($40B)——信任崩溃无法恢复</td></tr>
+    <tr><td><strong>收益型</strong></td><td>stETH质押+ETH空单Delta中性</td><td>USDe (Ethena)</td><td>负资金费率；对手方风险；复杂度风险</td></tr>
+  </table>
+  <div class="warning" style="margin-top:10px;"><div class="lbl">⚠️ 稳定币 ≠ 安全</div>不同类型风险完全不同。USDT的问题是「对方有没有骗你」，算法稳定币的问题是「数学设计有没有缺陷」——本质不同。稳定币已成为全球最重要的链上美元基础设施之一。</div>
+</div></div>
+
+<!-- ========== SLIDE 36: DeFi/NFT/RWA ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 5 · INDUSTRY</span>
+  <div class="section-title">DeFi、NFT与RWA版图</div>
+  <div class="g3 card-grid">
+    <div class="card cg"><h4>🏦 DeFi核心赛道</h4><p>• AMM DEX: Uniswap (x×y=k)<br>• 借贷: Aave/Compound<br>• 流动性质押: Lido<br>• CDP稳定币: MakerDAO<br>• 衍生品: dYdX/GMX<br>• 再质押: EigenLayer<br><br>核心创新 = <strong>可组合性</strong>：像「金融乐高」</p></div>
+    <div class="card cb"><h4>🎨 NFT演进</h4><p>PFP头像→链上艺术→游戏资产→域名(ENS)→链上身份证明→链上声誉</p><p style="margin-top:6px;">从「小图片炒作」到可验证的数字所有权基础设施。Beeple $69M(2021)标志着数字艺术正式进入主流。</p></div>
+    <div class="card cp"><h4>🏠 RWA现实资产</h4><p>国债代币化→私募信贷→大宗商品→房地产→证券代币化</p><p style="margin-top:6px;">BlackRock BUIDL基金——传统金融巨头进入RWA的标志。把万亿真实资产的收益带到链上——但也引入中心化托管风险。</p></div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 37: 交易所/钱包/托管 + 基础设施 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 5 · INDUSTRY</span>
+  <div class="section-title">交易所、钱包、托管 & 基础设施</div>
+  <div class="g3 card-grid" style="margin-bottom:12px;">
+    <div class="card ca"><h4>🏛️ CEX vs DEX</h4><p>CEX: Binance/Coinbase——高频交易、法币出入金、但托管风险(FTX)<br>DEX: Uniswap/dYdX——自托管、无许可<br>FTX是最好的「为什么自托管重要」教育案例。</p></div>
+    <div class="card cg"><h4>🔐 钱包</h4><p>MetaMask(EVM)、Phantom(Solana)——管理密钥+连接DApp<br>硬件钱包: Ledger/Trezor——冷存储<br>钱包 = Key Manager，钱永远在区块链上。</p></div>
+    <div class="card cb"><h4>🤝 托管方</h4><p>Coinbase Custody、BitGo、Fireblocks——机构级合规资产保管。<br>核心原则: <strong>Not your keys, not your coins.</strong></p></div>
+  </div>
+  <table>
+    <tr><th style="width:22%">类别</th><th style="width:32%">代表</th><th style="width:46%">做什么</th></tr>
+    <tr><td>RPC节点服务</td><td>Infura, Alchemy, QuickNode</td><td>提供区块链数据接口，大多数DApp依赖它们</td></tr>
+    <tr><td>数据与分析</td><td>The Graph, Dune, Nansen, Chainalysis</td><td>链上数据索引、SQL分析、合规分析</td></tr>
+    <tr><td>安全审计</td><td>Trail of Bits, OpenZeppelin, Certik</td><td>智能合约审计——DeFi上线前的标配</td></tr>
+    <tr><td>MEV缓解</td><td>Flashbots</td><td>研究并缓解MEV（矿工/验证者可提取价值）问题</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 38: Ch6 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--blue);">06</div>
+  <div class="title">专题深入</div>
+  <div class="sub">稳定币机制 · DeFi风险 · ETF与机构化 · AI对矿业和区块链的影响</div>
+  <div class="line" style="background:var(--blue);"></div>
+</div></div>
+
+<!-- ========== SLIDE 39: 稳定币专题 (1/3) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">稳定币专题 (1/3)：四种类型的完整机制对比</div>
+  <table>
+    <tr><th style="width:15%">类型</th><th style="width:28%">铸币机制</th><th style="width:28%">稳定性保障</th><th style="width:29%">风险点</th></tr>
+    <tr><td><strong>法币抵押型</strong></td><td>存入$1 → 发行1 USDT/USDC</td><td>发行方承诺1:1赎回</td><td>储备是否真实？可被冻结</td></tr>
+    <tr><td><strong>超额抵押型</strong></td><td>存入$150 ETH → 生成$100 DAI</td><td>清算线~$120，跌破即清算</td><td>抵押品暴跌+清算踩踏</td></tr>
+    <tr><td><strong>算法型</strong></td><td>燃烧LUNA铸造UST，套利维持$1</td><td>套利者恢复锚定（理论）</td><td>死亡螺旋——信任崩溃无法恢复</td></tr>
+    <tr><td><strong>收益型</strong></td><td>stETH收益+ETH空单=Delta中性</td><td>市场中性策略</td><td>负资金费率；对手方风险</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 40: 稳定币专题 (2/3) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">稳定币专题 (2/3)：储备、审计与冻结风险</div>
+  <div class="g2 card-grid">
+    <div class="card cb">
+      <h4>🔍 USDT储备构成</h4><p>大部分为美国国债和现金等价物（截至最新报告，需联网核对）。争议：历史上一度没有完整审计，透明度存疑。</p>
+      <p style="margin-top:6px;"><strong>USDC储备：</strong>BlackRock管理的美国国债+现金，月度审计。</p>
+    </div>
+    <div class="card cr">
+      <h4>⚠️ 三个核心风险</h4><p>① <strong>储备风险：</strong>法币抵押型——储备是否真的存在？<br>② <strong>冻结风险：</strong>USDT/USDC发行方可冻结特定地址<br>③ <strong>银行风险：</strong>2023 SVB倒闭时USDC脱锚至$0.87（Circle有$33亿存款卡在SVB）</p>
+      <p style="margin-top:6px;">中心化vs去中心化：DAI不可冻结但需超额抵押；USDC资本效率高但可被冻结。这是权衡。</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 41: 稳定币专题 (3/3) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">稳定币专题 (3/3)：作用与风险矩阵</div>
+  <div class="g3 card-grid">
+    <div class="card cg"><h4>六大作用</h4><p>① 法币出入金中间层<br>② 交易计价单位<br>③ DeFi基础资产<br>④ 跨境支付/汇款<br>⑤ 抗通胀/保值<br>⑥ AI Agent支付基础货币</p></div>
+    <div class="card cr"><h4>五类风险</h4><p>🔴 储备风险（中心化）<br>🟠 清算风险（超额抵押型）<br>🟡 脱锚风险（全部类型）<br>🟢 合约风险（技术漏洞）<br>🔵 监管风险（合规/Rug Pull）</p></div>
+    <div class="card cp"><h4>关键认知</h4><p>稳定币的PMF远超普通加密资产。USDT是加密世界最大的「系统性重要机构」之一。稳定币交易量已超过Visa和Mastercard的部分市场。</p><p style="font-size:10px;color:var(--text3);">（需联网核对最新数据）</p></div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 42: DeFi专题 (1/3) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">DeFi专题 (1/3)：核心金融逻辑</div>
+  <div class="g2 card-grid">
+    <div class="card cg">
+      <h4>🔄 AMM DEX (Uniswap)</h4><p>传统做市需要做市商→Uniswap用恒定乘积（x×y=k）让<strong>任何人都可以提供流动性并赚取手续费</strong>。</p>
+      <p style="margin-top:6px;">交易量越大→池越大→价格越稳定→手续费收入越多→吸引更多流动性提供者。</p>
+      <p style="margin-top:6px;">核心创新：「任何人都可以成为做市商，不再需要中心化交易所的订单簿」。</p>
+    </div>
+    <div class="card cg">
+      <h4>🏦 借贷协议 (Aave)</h4><p>存款人存入资产获得利息；借款人提供超额抵押品借出资产。</p>
+      <p style="margin-top:6px;"><strong>清算机制：</strong>抵押品价值/借款价值 < 清算阈值→清算人以折扣价购买抵押品并偿还债务。</p>
+      <p style="margin-top:6px;"><strong>依赖预言机实时价格</strong>——预言机操纵 = 错误清算 = 资金损失。</p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 43: DeFi专题 (2/3) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">DeFi专题 (2/3)：收益从哪来？</div>
+  <table>
+    <tr><th style="width:22%">收益来源</th><th style="width:24%">谁支付？</th><th style="width:54%">可持续性</th></tr>
+    <tr><td>① 交易手续费</td><td>用户真实支付的兑换费用</td><td style="color:var(--green);">✅ 真实收益，可持续</td></tr>
+    <tr><td>② 借贷利息</td><td>借款人支付的利息</td><td style="color:var(--green);">✅ 真实收益，可持续</td></tr>
+    <tr><td>③ Token补贴/激励</td><td>项目方印Token吸引流动性</td><td style="color:var(--red);">❌ 不可持续——补贴停=TVL崩塌</td></tr>
+    <tr><td>④ MEV</td><td>交易排序的利润</td><td>⚡ 真实但集中在验证者/搜索者手中</td></tr>
+    <tr><td>⑤ 质押/再质押奖励</td><td>网络发行的新Token（通胀）</td><td>⚠️ 取决于网络长期价值</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:10px;"><div class="lbl">🔑 判别标准</div>问自己——<strong>「这个协议的收益最终是谁支付的？」</strong>如果来自①② = 相对真实可持续。如果主要靠③ = 当补贴停止时TVL和APY将崩溃。2020「DeFi Summer」很多天价APY其实是Token补贴制造的幻觉——新用户的钱付给老用户的Ponzi结构。</div>
+</div></div>
+
+<!-- ========== SLIDE 44: DeFi专题 (3/3) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">DeFi专题 (3/3)：七层风险全景</div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">DeFi风险通常不是孤立发生——往往同时触发或互为因果。</p>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:22%">风险层</th><th style="width:38%">机制</th><th style="width:35%">案例</th></tr>
+    <tr><td>①</td><td style="color:var(--red);">🔴 智能合约漏洞</td><td>代码Bug→资金被盗</td><td>The DAO (360万ETH), Poly ($610M)</td></tr>
+    <tr><td>②</td><td style="color:#f97316;">🟠 预言机操纵</td><td>喂价被操纵→触发错误清算</td><td>Mango Markets ($116M, 2022)</td></tr>
+    <tr><td>③</td><td style="color:#eab308;">🟡 闪电贷攻击</td><td>无抵押大额贷款执行清算/操纵</td><td>DeFi特有攻击向量</td></tr>
+    <tr><td>④</td><td style="color:var(--green);">🟢 治理攻击</td><td>购买治理Token劫持协议</td><td>Beanstalk ($182M, 2022)</td></tr>
+    <tr><td>⑤</td><td style="color:var(--blue);">🔵 流动性风险</td><td>大户撤出→滑点飙升/挤兑式清算</td><td>频繁发生</td></tr>
+    <tr><td>⑥</td><td style="color:var(--purple);">🟣 跨链桥风险</td><td>跨链资产技术/信任成本</td><td>Ronin ($620M), Wormhole ($325M)</td></tr>
+    <tr><td>⑦</td><td>⚫ 系统性传染</td><td>一个协议出问题→通过可组合性传染全生态</td><td>2022 Luna→3AC→多家破产</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 45: ETF & 机构化 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">ETF与机构化：改变的是资金入口，不是协议</div>
+  <div class="g2 card-grid">
+    <div class="card ca">
+      <h4>✅ ETF带来了什么？</h4><p>• 合规渠道——受SEC/CFTC监管的BTC敞口<br>• 税收优势——401k/IRA等免税账户可持有<br>• 降低门槛——不需要管理私钥/助记词<br>• 流动性集中——做市商/授权参与者<br>• 百亿美元级净流入——传统金融终于能买BTC了</p>
+    </div>
+    <div class="card cr">
+      <h4>⚠️ ETF不改变什么？& 双面性</h4><p>BTC协议无变动 | 2100万上限不变 | 出块时间不变</p>
+      <p style="margin-top:6px;">⚠️ ETF持有者<strong>不持有私钥</strong>（托管方代为持有）<br>⚠️ 交易时间限制（美股时间 vs BTC现货24/7）<br>⚠️ 管理费（通常0.2-1.5%/年）<br>⚠️ <strong>双向性：</strong>价格下跌时也是卖出通道</p>
+    </div>
+  </div>
+  <div class="keypoint" style="margin-top:10px;"><div class="lbl">🔑 ETF = 资金入口的包装层</div>就像与世隔绝的村子修了高速公路——村子没变，进来的人多了。ETF投资者不是「持有BTC的人」——托管人替他们持有。有人讽刺：「如果你不能移动你的币，那真的是你的币吗？」但大部分人不在乎——他们只想要美元回报。</div>
+</div></div>
+
+<!-- ========== SLIDE 46: AI影响 (上) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">AI对BTC的影响（上）：电力与矿业的争夺</div>
+  <div class="card ca" style="margin-bottom:12px;">
+    <h4>🔌 核心逻辑链</h4><p>AI训练和推理→对数据中心/GPU集群/低价电力的需求暴增→BTC矿企恰好拥有：已接入电网的大容量电力合同、矿场基础设施（散热/变压器）、与电力公司长期合作的能源调度能力。<strong>→矿企转型：挖矿 + AI/HPC托管双业务</strong>（Core Scientific × CoreWeave签下$3.5B合同）。</p>
+  </div>
+  <table>
+    <tr><th style="width:50%">对BTC网络的短期影响</th><th style="width:50%">对矿企的长期影响</th></tr>
+    <tr><td>算力部分转向AI → BTC算力可能下降</td><td>收入多元化：挖矿 + AI托管双收入</td></tr>
+    <tr><td>难度相应下调</td><td>抗周期能力增强（熊市时AI收入补血）</td></tr>
+    <tr><td>短期安全预算可能减少</td><td>长期更健康：不纯粹依赖BTC价格</td></tr>
+    <tr><td>AI对BTC价格的影响主要通过宏观流动性传导</td><td>低成本电力仍是矿企核心竞争力</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 47: AI影响 (下) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--blue);">PART 6 · DEEP DIVE</span>
+  <div class="section-title">AI对BTC的影响（下）：支付 & 真实机会 vs 伪需求</div>
+  <table style="margin-bottom:12px;">
+    <tr><th style="width:16%">支付方式</th><th style="width:12%">速度</th><th style="width:14%">成本</th><th style="width:16%">可编程</th><th style="width:42%">适合AI Agent?</th></tr>
+    <tr><td>BTC L1</td><td>~10分钟</td><td>$1-5+</td><td>❌</td><td>❌ 不适合</td></tr>
+    <tr><td>Lightning</td><td>秒级</td><td><$0.01</td><td>部分</td><td>✅ 适合微支付</td></tr>
+    <tr><td>稳定币(L2)</td><td>秒级</td><td><$0.01</td><td>✅ EVM</td><td style="color:var(--green);">✅ 最佳方案</td></tr>
+    <tr><td>ETH L2</td><td>秒-分钟</td><td><$0.01-0.10</td><td>✅ EVM</td><td>✅ 适合</td></tr>
+  </table>
+  <table>
+    <tr><th style="width:50%;color:var(--green);">🟢 真实机会</th><th style="width:50%;color:var(--red);">🔴 伪需求/过度炒作</th></tr>
+    <tr><td>链上AI推理可验证性（ZKML——用ZK证明AI确实运行了）<br>去中心化算力市场（Render/Akash/io.net）<br>AI Agent链上自动支付（Lightning/稳定币）<br>对抗AI虚假内容——区块链时间戳+内容签名</td><td>「AI链」——AI不需要在区块链上运行<br>「区块链训练AI」——网络延迟和吞吐量远远不够<br>「AI Token因为有AI功能而升值」——大多没有实际效用<br>「AI将导致BTC暴涨」的过度简化叙事</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:8px;"><div class="lbl">🔑 判断标准</div>问自己——<strong>「如果不用区块链，这个AI应用能正常工作吗？」</strong>如果能，区块链可能不是必需的。如果不能（如可验证推理、抗审查支付），区块链是真的在解决问题。</div>
+</div></div>
+
+<!-- ========== SLIDE 48: Ch7 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--red);">07</div>
+  <div class="title">风险与监管</div>
+  <div class="sub">五层风险框架 · 安全事件回顾 · 全球监管对比 · 独立研究检查清单</div>
+  <div class="line" style="background:var(--red);"></div>
+</div></div>
+
+<!-- ========== SLIDE 49: 五层风险框架 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 7 · RISK</span>
+  <div class="section-title">五层系统性风险框架</div>
+  <p style="font-size:12px;color:var(--text2);margin-bottom:8px;">风险必须分层分析——不能混为一谈。FTX崩盘是应用层风险，不是BTC协议不安全。</p>
+  <div class="card cr" style="margin-bottom:6px;"><h4>🔴 技术层风险</h4><p>智能合约漏洞、私钥丢失/被盗、51%攻击、跨链桥攻击、预言机操纵。直接影响：资金被盗或永久丢失。</p></div>
+  <div class="card ca" style="margin-bottom:6px;"><h4>🟠 经济层风险</h4><p>Token模型崩盘（死亡螺旋）、流动性危机（挤兑）、清算踩踏、稳定币脱锚。直接影响：资产归零。</p></div>
+  <div class="card cp" style="margin-bottom:6px;"><h4>🟡 治理层风险</h4><p>治理攻击（购买Token劫持DAO）、中心化团队独断、社区分裂（硬分叉）。直接影响：协议被劫持、生态分裂。</p></div>
+  <div class="card cg" style="margin-bottom:6px;"><h4>🟢 监管层风险</h4><p>合规不确定性、禁令、稳定币储备审查、税务政策变化。直接影响：业务被迫中止、资产冻结。</p></div>
+  <div class="card cb"><h4>🔵 应用层风险</h4><p>钓鱼攻击、Rug Pull（卷款跑路）、使用复杂导致误操作、托管方跑路/欺诈。直接影响：被诈骗、操作失误损失。</p></div>
+</div></div>
+
+<!-- ========== SLIDE 50: 安全事件回顾 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 7 · RISK</span>
+  <div class="section-title">重大安全事件回顾：历史是最好的老师</div>
+  <table>
+    <tr><th style="width:22%">事件</th><th style="width:8%">年份</th><th style="width:20%">损失</th><th style="width:25%">根因</th><th style="width:25%">经验教训</th></tr>
+    <tr><td>Mt.Gox</td><td>2014</td><td>~850K BTC</td><td>中心化交易所安全漏洞</td><td>Not your keys, not your coins</td></tr>
+    <tr><td>The DAO</td><td>2016</td><td>360万 ETH</td><td>智能合约重入攻击</td><td>代码即法律 vs 代码为人服务</td></tr>
+    <tr><td>Parity多签</td><td>2017</td><td>150K ETH永久冻结</td><td>代码Bug触发自毁</td><td>复杂合约需严格审计</td></tr>
+    <tr><td>Ronin Bridge</td><td>2022</td><td>$620M</td><td>5/9多签密钥被盗</td><td>桥的安全模型严重薄弱</td></tr>
+    <tr><td>Wormhole</td><td>2022</td><td>$325M</td><td>合约漏洞</td><td>桥是最频繁被攻击的环节</td></tr>
+    <tr><td>FTX</td><td>2022</td><td>$8B</td><td>托管方欺诈/挪用</td><td>自托管的根本重要性</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:8px;"><div class="lbl">🔑 共性</div>没有一个是「区块链协议本身」被攻破。BTC和ETH协议在这些极端压力事件中保持正常运行——这正是去中心化系统的韧性。最脆弱的环节：<strong>桥、合约、交易所</strong>——连接层和应用层，而不是协议层本身。</div>
+</div></div>
+
+<!-- ========== SLIDE 51: 托管风险 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 7 · RISK</span>
+  <div class="section-title">托管风险与安全最佳实践</div>
+  <table>
+    <tr><th style="width:16%">维度</th><th style="width:42%">自托管 (Self-Custody)</th><th style="width:42%">第三方托管 (Custodian)</th></tr>
+    <tr><td><strong>风险</strong></td><td>私钥丢失/被盗(~15-20%BTC已永久丢失)<br>钓鱼攻击<br>人为错误（助记词遗失）</td><td>挪用(FTX)<br>黑客攻击<br>政策冻结<br>银行风险</td></tr>
+    <tr><td><strong>责任</strong></td><td>100%自己负责</td><td>托管方责任（合规+有保险的情况下）</td></tr>
+    <tr><td><strong>适用</strong></td><td>长期大额存储</td><td>日常交易、新手入门</td></tr>
+    <tr><td><strong>最佳实践</strong></td><td>多签(2/3) | MPC分片 | 硬件钱包 | 助记词物理备份</td><td>选择受监管合规托管方 | 分散存放 | 了解保险覆盖</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 52: 全球监管 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 7 · RISK</span>
+  <div class="section-title">全球监管全景</div>
+  <table>
+    <tr><th style="width:12%">国家/地区</th><th style="width:22%">监管态度</th><th style="width:66%">主要进展</th></tr>
+    <tr><td>🇺🇸 美国</td><td>逐步明晰</td><td>现货BTC/ETH ETF获批；SEC+CFTC双监管；FIT21法案推进中</td></tr>
+    <tr><td>🇪🇺 欧盟</td><td>最全面框架</td><td>MiCA 2024全面生效——最完善的加密资产市场法规</td></tr>
+    <tr><td>🇭🇰 香港</td><td>积极拥抱</td><td>2023新牌照制度；2024批准现货BTC/ETH ETF</td></tr>
+    <tr><td>🇸🇬 新加坡</td><td>严格但明确</td><td>MAS支付服务法监管；潜力Web3中心</td></tr>
+    <tr><td>🇯🇵 日本</td><td>支持Web3</td><td>Web3国家战略；税收改革推进；交易所持牌经营</td></tr>
+    <tr><td>🇨🇳 中国</td><td>禁止交易/挖矿</td><td>2021全面禁令；大力推动数字人民币和联盟链</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:8px;"><div class="lbl">🔑 监管不是敌人</div>明确的监管框架带来合规资金流入、机构参与和行业规范化。真正的问题是监管真空带来的不确定性。核心关注：交易所许可 | 稳定币储备 | 证券认定(Howey Test) | 托管方资质 | AML/KYC | 税务。</div>
+</div></div>
+
+<!-- ========== SLIDE 53: 研究检查清单 (1/2) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 7 · RISK</span>
+  <div class="section-title">独立研究检查清单（1/2）——评估任何加密项目</div>
+  <table>
+    <tr><th style="width:4%">#</th><th style="width:16%">检查项</th><th style="width:36%">关键问题</th><th style="width:44%">风险信号</th></tr>
+    <tr><td>1</td><td>问题必要性</td><td>这个项目解决什么问题？</td><td>不需要区块链也能解决的问题</td></tr>
+    <tr><td>2</td><td>团队</td><td>团队公开吗？有相关经验吗？</td><td>匿名团队+无历史记录</td></tr>
+    <tr><td>3</td><td>代码与审计</td><td>开源吗？通过哪些审计？</td><td>闭源+无审计报告</td></tr>
+    <tr><td>4</td><td>Token经济</td><td>Token分配合理吗？谁持有最多？</td><td>团队/VC持有>50%，解锁时间短</td></tr>
+    <tr><td>5</td><td>真实用户</td><td>真实需求还是补贴驱动？</td><td>补贴停止后TVL/用户崩塌</td></tr>
+  </table>
+</div></div>
+
+<!-- ========== SLIDE 54: 研究检查清单 (2/2) ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(239,68,68,0.15);color:var(--red);">PART 7 · RISK</span>
+  <div class="section-title">独立研究检查清单（2/2）——评估任何加密项目</div>
+  <table>
+    <tr><th style="width:4%">#</th><th style="width:16%">检查项</th><th style="width:36%">关键问题</th><th style="width:44%">风险信号</th></tr>
+    <tr><td>6</td><td>收入模型</td><td>协议有持续收入吗？从哪来？</td><td>唯一的收入来源=发行新Token</td></tr>
+    <tr><td>7</td><td>监管</td><td>Token是否可能被认定为证券？</td><td>未进行法律分析+无合规措施</td></tr>
+    <tr><td>8</td><td>托管</td><td>谁控制私钥/协议管理员密钥？</td><td>单一实体/服务器控制核心密钥</td></tr>
+    <tr><td>9</td><td>安全历史</td><td>有无安全事件？如何处理的？</td><td>有未解决的安全问题</td></tr>
+    <tr><td>10</td><td>依赖风险</td><td>依赖哪些外部组件？</td><td>高度依赖单一未审计的桥或预言机</td></tr>
+  </table>
+  <div class="keypoint" style="margin-top:8px;"><div class="lbl">🔑 这套「十问」方法是教人钓鱼</div>培训的目的不是告诉大家哪个项目好或坏，而是让每个人有能力独立做判断。回答「不知道」或「没有」的项目越多，风险越高。</div>
+</div></div>
+
+<!-- ========== SLIDE 55: Ch8 Divider ========== -->
+<div class="slide"><div class="slide-inner divider">
+  <div class="num" style="color:var(--green);">08</div>
+  <div class="title">未来趋势与总结</div>
+  <div class="sub">BTC长期叙事 · 五个确定性趋势 · 矿业与AI融合 · 十五年一轮回</div>
+  <div class="line" style="background:var(--green);"></div>
+</div></div>
+
+<!-- ========== SLIDE 56: BTC长期定位 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 8 · FUTURE</span>
+  <div class="section-title">BTC长期定位：非主权稀缺资产的全球化叙事</div>
+  <div class="g2 card-grid">
+    <div class="card ca">
+      <h4>🎯 三大叙事支柱</h4><p>① <strong>非主权资产</strong>——不隶属任何政府/国家，无法被单一实体没收或冻结<br>② <strong>绝对稀缺</strong>——2100万，数学保证，无法被任何人改变<br>③ <strong>全球可访问</strong>——有互联网连接就能持有、接收和转移</p>
+      <p style="margin-top:6px;"><strong>潜在路径：</strong>全球战略储备资产 | 结算网络基础层 | 机构/主权基金配置标配</p>
+    </div>
+    <div class="card cr">
+      <h4>🔮 四种风险情景</h4><p>① 被大多数国家联合禁止——部分国家已禁止，但全球共识难以达成<br>② 量子计算突破——威胁SHA-256/ECDSA，至少需10-20年，社区可迁移<br>③ 更好的替代资产出现——AI时代可能出现新的稀缺形式<br>④ 自身经济模型无法维持长期安全——手续费能否足够？<strong>（开放问题）</strong></p>
+    </div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 57: 五个确定性趋势 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 8 · FUTURE</span>
+  <div class="section-title">五个确定性趋势 (2025-2035)</div>
+  <div class="g3 card-grid">
+    <div class="card cb"><h4>1. 稳定币成为全球链上美元</h4><p>跨境支付、抗通胀、AI Agent支付、DeFi基础资产——四个方向的PMF持续巩固。<br>AI驱动的「机器经济」最可能采用稳定币作为计价/支付媒介。</p></div>
+    <div class="card cg"><h4>2. RWA与传统金融融合</h4><p>国债→信贷→大宗商品→房地产——数万亿真实资产逐步上链。BlackRock CEO称代币化是「市场的下一代」。</p></div>
+    <div class="card cp"><h4>3. DeFi从补贴转向真实收益</h4><p>Token补贴退潮→手续费/利息/MEV成为主要收益来源。合规DeFi+传统金融链上化→走向成熟。</p></div>
+    <div class="card ca"><h4>4. 矿业与AI/HPC融合</h4><p>矿企基础设施→AI/HPC托管。收入多元化→抗周期能力增强→长期更健康。低电价仍是最核心竞争力。</p></div>
+    <div class="card cb"><h4>5. 监管清晰化</h4><p>明确规则→合规资金流入→机构化→基础设施成熟→行业进入下一阶段。MiCA/FIT21为全球提供模板。</p></div>
+  </div>
+</div></div>
+
+<!-- ========== SLIDE 58: 技术路线图 ========== -->
+<div class="slide"><div class="slide-inner">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--green);">PART 8 · FUTURE</span>
+  <div class="section-title">技术演进路线图 & AI × 区块链融合</div>
+  <table style="margin-bottom:14px;">
+    <tr><th style="width:18%">技术方向</th><th style="width:41%">BTC生态</th><th style="width:41%">Ethereum/通用生态</th></tr>
+    <tr><td><strong>扩容</strong></td><td>Lightning路由优化；BTC Rollup(BitVM)</td><td>L2以Rollup为中心；数据可用性采样(DAS)</td></tr>
+    <tr><td><strong>智能合约</strong></td><td>BitVM乐观验证；比特币L2智能合约</td><td>zkEVM最终化；账户抽象(AA)</td></tr>
+    <tr><td><strong>跨链</strong></td><td>比特币→其他链的信任最小化桥</td><td>意图桥(Intent Bridge)替代锁定桥</td></tr>
+    <tr><td><strong>抗量子</strong></td><td>NIST后量子标准→签名算法逐步迁移</td><td>各链签名算法迁移计划</td></tr>
+    <tr><td><strong>AI融合</strong></td><td>Lightning→AI Agent微支付</td><td>ZKML→链上AI推理验证；Agent经济</td></tr>
+  </table>
+  <div class="card ca"><h4>🎯 AI Agent支付</h4><p>10年内AI Agent之间的自动支付可能超过人类的链上支付。支付层更可能基于稳定币/L2——BTC L1不适合微支付，但BTC作为长期结算和价值存储资产保持独特定位。</p></div>
+</div></div>
+
+<!-- ========== SLIDE 59: 总结 ========== -->
+<div class="slide"><div class="slide-inner" style="text-align:center;">
+  <div style="font-size:80px;margin-bottom:12px;">₿</div>
+  <div class="section-title" style="margin-bottom:16px;">总结与思考</div>
+  <div class="g2 card-grid" style="text-align:left;">
+    <div class="card ca">
+      <h4>💡 核心收获</h4>
+      <p>• Bitcoin是密码朋克数十年思想和技术的集大成者——一种用密码学和经济激励替代信任中介的全新价值传递范式</p>
+      <p>• 理解Bitcoin的关键在于理解它的<strong>设计取舍</strong>：慢是因为要验证，贵是因为要安全，不变是因为要可信——这些不是Bug，是Features</p>
+      <p>• 区块链已从单一加密资产演变为完整的多层产业——要像理解TCP/IP/HTTP一样理解它作为价值互联网底层协议的本质</p>
+    </div>
+    <div class="card cp">
+      <h4>🔮 值得思考的问题</h4>
+      <p>• BTC会成为全球储备资产还是全球支付网络？</p>
+      <p>• 2140年全部挖完后，手续费能否维持网络安全？</p>
+      <p>• 隐私(ZKP)与监管(KYC/AML)如何平衡？</p>
+      <p>• 量子计算何时能威胁现有密码学？社区如何应对？</p>
+      <p>• 区块链最终会像互联网一样「无处不在且不可见」吗？</p>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--text3);margin-top:16px;">
+    2009.1.3 创世区块 · 2024.1.10 SEC批准ETF · 十五年一轮回<br>
+    <strong>Don't trust, verify.</strong> 从对传统金融的无声抗议，到被同一个体系所接纳。<br>
+    感谢聆听 · 欢迎讨论
+  </p>
+</div></div>
+
+</div><!-- /slides-container -->
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+
+function showSlide(index) {
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'prev');
+    if (i === index) s.classList.add('active');
+    else if (i < index) s.classList.add('prev');
+  });
+  document.getElementById('pageNum').textContent = `${index + 1} / ${totalSlides}`;
+  updateNavDots();
+  currentSlide = index;
+}
+
+function updateNavDots() {
+  const container = document.getElementById('navDots');
+  container.innerHTML = '';
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    dot.onclick = () => showSlide(i);
+    dot.title = `第 ${i+1} 页`;
+    container.appendChild(dot);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1);
+}
+function prevSlide() {
+  if (currentSlide > 0) showSlide(currentSlide - 1);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault(); nextSlide();
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault(); prevSlide();
+  } else if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+  else if (e.key === 'End') { e.preventDefault(); showSlide(totalSlides - 1); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+});
+
+// Mouse wheel for slide content scrolling; Shift+Wheel for page navigation
+document.querySelectorAll('.slide-inner').forEach(el => {
+  el.addEventListener('wheel', (e) => {
+    const atTop = el.scrollTop === 0;
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 5;
+    if (e.shiftKey) { e.preventDefault(); e.deltaY > 0 ? nextSlide() : prevSlide(); return; }
+    if (e.deltaY < 0 && atTop) { e.preventDefault(); prevSlide(); }
+    else if (e.deltaY > 0 && atBottom) { e.preventDefault(); nextSlide(); }
+  }, { passive: false });
+});
+
+showSlide(0);
+
+// ---- Fullscreen ----
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+    document.body.classList.remove('fullscreen');
+  } else {
+    document.documentElement.requestFullscreen();
+    document.body.classList.add('fullscreen');
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) document.body.classList.remove('fullscreen');
+});
+// F key to toggle fullscreen (but not when typing in inputs)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'f' && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement === document.body) {
+    e.preventDefault(); toggleFullscreen();
+  }
+});
+</script>
+
+</body>
+</html>

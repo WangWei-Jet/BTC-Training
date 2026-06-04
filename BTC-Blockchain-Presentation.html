@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>比特币 & 区块链 - 从起源到未来</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a2e;
+    --accent: #f7931a;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #8b5cf6;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --golden: linear-gradient(135deg, #f7931a, #f59e0b, #fbbf24);
+    --gradient-dark: linear-gradient(180deg, #1a1a2e 0%, #0a0a0f 100%);
+  }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* Navigation bar */
+  .nav-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+    background: rgba(18, 18, 26, 0.9);
+    backdrop-filter: blur(20px);
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .nav-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .nav-dot.active { background: var(--accent); box-shadow: 0 0 12px rgba(247,147,26,0.6); transform: scale(1.3); }
+  .nav-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.15); }
+  .nav-page { color: var(--text2); font-size: 13px; display: flex; align-items: center; padding: 0 8px; min-width: 60px; justify-content: center; }
+
+  /* Slides container */
+  .slides-container {
+    width: 100vw; height: 100vh;
+    position: relative;
+  }
+  .slide {
+    position: absolute;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateX(40px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    padding: 60px;
+  }
+  .slide.active {
+    opacity: 1; transform: translateX(0);
+    pointer-events: auto;
+  }
+  .slide.prev { opacity: 0; transform: translateX(-40px); }
+
+  /* Slide content wrapper */
+  .slide-content {
+    max-width: 1100px; width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  /* Title slide */
+  .title-slide { text-align: center; }
+  .title-slide .icon-bitcoin {
+    font-size: 120px; margin-bottom: 24px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  .title-slide h1 {
+    font-size: 56px; font-weight: 900;
+    background: var(--golden);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+  .title-slide .subtitle {
+    font-size: 22px; color: var(--text2);
+    font-weight: 300; letter-spacing: 4px;
+  }
+  .title-slide .meta {
+    margin-top: 36px; font-size: 14px; color: var(--text3);
+  }
+
+  /* Section headers */
+  .section-header {
+    text-align: center; margin-bottom: 40px;
+  }
+  .section-tag {
+    display: inline-block;
+    padding: 4px 16px; border-radius: 50px;
+    font-size: 12px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .section-header h2 {
+    font-size: 38px; font-weight: 800;
+    background: linear-gradient(135deg, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .section-header p { color: var(--text2); font-size: 16px; margin-top: 8px; }
+
+  /* Card grid */
+  .card-grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .card .card-icon { font-size: 32px; margin-bottom: 12px; }
+  .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  /* Accent cards */
+  .card.accent-orange { border-left: 3px solid var(--accent); }
+  .card.accent-blue { border-left: 3px solid var(--accent2); }
+  .card.accent-green { border-left: 3px solid var(--accent3); }
+  .card.accent-purple { border-left: 3px solid var(--accent4); }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 40px; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 15px; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(180deg, var(--accent), var(--accent2), var(--accent4));
+  }
+  .timeline-item {
+    position: relative; margin-bottom: 28px;
+    background: var(--card); border-radius: 12px;
+    padding: 20px 24px; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute; left: -33px; top: 24px;
+    width: 12px; height: 12px;
+    border-radius: 50%; background: var(--accent);
+    border: 2px solid var(--bg); box-shadow: 0 0 8px rgba(247,147,26,0.5);
+  }
+  .timeline-year {
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    letter-spacing: 2px; margin-bottom: 4px;
+  }
+  .timeline-item h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .timeline-item p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* Concept highlight */
+  .concept-block {
+    background: var(--card); border-radius: 16px; padding: 32px;
+    border: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px;
+  }
+  .concept-block h3 { font-size: 22px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .concept-block .formula {
+    background: rgba(0,0,0,0.3); border-radius: 8px;
+    padding: 16px 24px; margin: 12px 0;
+    font-family: 'SF Mono', 'Cascadia Code', monospace;
+    font-size: 14px; color: var(--accent3);
+    overflow-x: auto; white-space: pre;
+    border: 1px solid rgba(16,185,129,0.2);
+  }
+
+  /* Flowchart style */
+  .flow-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; flex-wrap: wrap; margin: 20px 0;
+  }
+  .flow-box {
+    background: var(--card); border-radius: 12px;
+    padding: 16px 24px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    min-width: 120px;
+  }
+  .flow-box .num {
+    font-size: 24px; font-weight: 900;
+    color: var(--accent);
+  }
+  .flow-box .label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .flow-arrow { font-size: 24px; color: var(--text3); }
+
+  /* Two column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+
+  /* Stats */
+  .stat-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .stat-card {
+    background: var(--card); border-radius: 16px;
+    padding: 24px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+    min-width: 160px;
+  }
+  .stat-card .stat-value {
+    font-size: 32px; font-weight: 900;
+    background: var(--golden);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-card .stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+  /* Table */
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    border-radius: 12px; overflow: hidden;
+  }
+  .data-table th {
+    background: rgba(247,147,26,0.15);
+    padding: 14px 16px; text-align: left;
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .data-table td {
+    padding: 12px 16px; font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Scrollbar */
+  .slide-content::-webkit-scrollbar { width: 4px; }
+  .slide-content::-webkit-scrollbar-track { background: transparent; }
+  .slide-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+  /* Print styles */
+  @media print {
+    body { overflow: visible; height: auto; }
+    .slides-container { position: static; height: auto; }
+    .slide { position: static; opacity: 1; transform: none; page-break-after: always; min-height: 100vh; }
+    .nav-bar { display: none; }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .slide { padding: 24px; }
+    .slide-content { max-height: 85vh; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .title-slide h1 { font-size: 32px; }
+    .section-header h2 { font-size: 26px; }
+    .stat-row { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<div class="nav-bar" id="navBar">
+  <button class="nav-btn" onclick="prevSlide()" title="上一页">◀</button>
+  <div id="navDots"></div>
+  <span class="nav-page" id="pageNum">1 / 20</span>
+  <button class="nav-btn" onclick="nextSlide()" title="下一页">▶</button>
+</div>
+
+<!-- Slides -->
+<div class="slides-container" id="slidesContainer">
+
+<!-- ==================== SLIDE 1: 封面 ==================== -->
+<div class="slide active">
+<div class="slide-content title-slide">
+  <div class="icon-bitcoin">₿</div>
+  <h1>比特币 & 区块链</h1>
+  <div class="subtitle">从密码朋克的幻想到数字文明的基石</div>
+  <div class="meta">2026 年 6 月 · 技术演进与未来展望</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 2: 目录 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">OVERVIEW</span>
+  <h2>内容概览</h2>
+</div>
+<div class="card-grid grid-2" style="margin-top:24px;">
+  <div class="card accent-orange"><div class="card-icon">📜</div><h3>第一部分：历史脉络</h3><p>从密码朋克运动、白皮书诞生到机构化时代的演进历程</p></div>
+  <div class="card accent-blue"><div class="card-icon">⚙️</div><h3>第二部分：核心原理</h3><p>哈希函数、非对称加密、共识机制、UTXO 模型等底层技术</p></div>
+  <div class="card accent-green"><div class="card-icon">🔗</div><h3>第三部分：关键概念</h3><p>钱包、挖矿、分叉、Layer2、智能合约等重要概念深度解析</p></div>
+  <div class="card accent-purple"><div class="card-icon">🔮</div><h3>第四部分：未来展望</h3><p>扩容方案、DeFi、监管趋势、Web3 与元宇宙的融合</p></div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 3: 前比特币时代 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <h2>前比特币时代：密码朋克的梦想</h2>
+  <p>1980s–2008 · 数字货币的思想与技术先驱</p>
+</div>
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-year">1976</div>
+    <h4>Diffie-Hellman 公钥密码学</h4>
+    <p>Whitfield Diffie 和 Martin Hellman 发表《密码学的新方向》，奠定非对称加密的理论基础，为数字货币的签名验证提供数学工具。</p>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1983</div>
+    <h4>David Chaum · eCash</h4>
+    <p>密码学家 David Chaum 提出盲签名技术并创建 eCash 系统，"加密货币之父"首次实现匿名电子现金。</p>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1997</div>
+    <h4>Adam Back · Hashcash</h4>
+    <p>发明工作量证明（PoW）系统用于反垃圾邮件——比特币挖矿机制的直接前身。每封邮件附带一个计算成本，让垃圾邮件不再经济。</p>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1998</div>
+    <h4>Wei Dai · B-money & Nick Szabo · Bit Gold</h4>
+    <p>分别提出去中心化数字货币方案，引入分布式账本和 PoW 铸造货币的思想。Szabo 后来也被怀疑是"中本聪"。</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 4: 白皮书与创世 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <h2>2008–2009：比特币的诞生</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-orange" style="margin-bottom:16px;">
+      <h3>📄 白皮书发布 2008.10.31</h3>
+      <p>中本聪（Satoshi Nakamoto）在密码学邮件列表发布《Bitcoin: A Peer-to-Peer Electronic Cash System》，仅 9 页，却改变了世界。</p>
+    </div>
+    <div class="card accent-orange" style="margin-bottom:16px;">
+      <h3>⛏️ 创世区块 2009.1.3</h3>
+      <p>中本聪挖出区块 #0（创世区块），Coinbase 数据中嵌入泰晤士报标题：<br><em>"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"</em><br>—— 对传统金融体系的无声讽刺。</p>
+    </div>
+    <div class="card accent-orange">
+      <h3>🍕 比特币披萨日 2010.5.22</h3>
+      <p>程序员 Laszlo Hanyecz 用 10,000 BTC 购买了两份 Papa John's 披萨，这是比特币首次用于实物交易。按 2024 年高点计算，这两份披萨价值约 7 亿美元。</p>
+    </div>
+  </div>
+  <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:300px;">
+    <div style="text-align:center;">
+      <div style="font-size:80px;">👤</div>
+      <h3 style="margin-top:12px;">中本聪之谜</h3>
+      <p style="color:var(--text2);font-size:13px;line-height:1.8;">
+        2010年12月，中本聪发布了最后一条消息后彻底消失。<br><br>
+        其钱包持有约 110 万 BTC（从未动用）。<br><br>
+        身份至今成谜，是密码学历史上最大的未解之谜之一。
+      </p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 5: 发展时间线 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 1 · HISTORY</span>
+  <h2>比特币发展关键里程碑</h2>
+</div>
+<div class="timeline">
+  <div class="timeline-item"><div class="timeline-year">2009.1</div><h4>创世区块 & v0.1 客户端</h4><p>区块奖励 50 BTC，全网只有一个节点在运行。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2011</div><h4>比特币达到 1 美元 & 山寨币出现</h4><p>Litecoin、Namecoin 等项目涌现，开启加密货币多元化时代。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2013</div><h4>首次突破 1000 美元 & 中国关注</h4><p>人民银行等五部委发布《关于防范比特币风险的通知》，定义为虚拟商品。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2015</div><h4>以太坊主网上线</h4><p>Vitalik Buterin 将图灵完备的智能合约带入区块链，开启"区块链 2.0"。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2017</div><h4>SegWit 激活 & 比特币突破 19000 美元</h4><p>隔离见证升级为闪电网络铺路，ICO 热潮席卷全球。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2020.5</div><h4>第三次减半 & 机构入场</h4><p>MicroStrategy、Square、Tesla 等上市公司将 BTC 纳入资产负债表。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2024.1</div><h4>美国比特币现货 ETF 获批</h4><p>SEC 批准 11 支比特币现货 ETF，主流金融体系正式接纳比特币。</p></div>
+  <div class="timeline-item"><div class="timeline-year">2024.4</div><h4>第四次减半</h4><p>区块奖励降至 3.125 BTC，通胀率降至约 0.85%。</p></div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 6: 哈希函数 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--accent2);">PART 2 · TECH</span>
+  <h2>哈希函数：区块链的基石</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>🔐 SHA-256</h3>
+      <p>比特币使用 SHA-256（Secure Hash Algorithm 256-bit）作为核心哈希函数。任意长度输入 → 固定 256 位（64 个十六进制字符）输出。</p>
+      <div class="formula">SHA256("Hello") = 185f8db3...331a9f25
+SHA256("hello") = 2cf24dba...4bb45b59</div>
+      <p style="font-size:12px;color:var(--text3);">仅一个字母大小写不同，输出完全不同——雪崩效应。</p>
+    </div>
+    <div class="card accent-blue">
+      <h3>🎯 哈希的五大特性</h3>
+      <p>① <strong>确定性</strong>：同一输入永远产生同一输出<br>
+      ② <strong>单向性</strong>：从输出无法反推输入<br>
+      ③ <strong>雪崩效应</strong>：微小输入变化导致输出剧烈变化<br>
+      ④ <strong>碰撞抵抗</strong>：无法找到两个不同输入产生相同输出<br>
+      ⑤ <strong>快速计算</strong>：计算哈希快速，反向不可能</p>
+    </div>
+  </div>
+  <div class="card accent-blue" style="margin-bottom:16px;">
+    <h3>🔄 在比特币中的应用</h3>
+    <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+      <p>📦 <strong>区块哈希</strong>：每个区块头通过双重 SHA-256 生成唯一标识</p>
+      <p style="margin-top:8px;">⛏️ <strong>工作量证明</strong>：矿工不断修改 nonce 寻找满足难度目标的哈希</p>
+      <p style="margin-top:8px;">🔗 <strong>链式结构</strong>：每个区块包含前一个区块的哈希，形成不可篡改的链</p>
+      <p style="margin-top:8px;">🌲 <strong>默克尔树</strong>：将数千笔交易压缩为一个根哈希，高效验证</p>
+      <p style="margin-top:8px;">🔑 <strong>地址生成</strong>：公钥 → SHA256 → RIPEMD160 → Base58 → 地址</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 7: 非对称加密 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--accent2);">PART 2 · TECH</span>
+  <h2>非对称加密与数字签名</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>🔑 ECDSA 椭圆曲线数字签名算法</h3>
+      <p>比特币使用 <strong>secp256k1</strong> 椭圆曲线参数。核心方程：</p>
+      <div class="formula">y² = x³ + 7</div>
+      <p>通过椭圆曲线上的点乘运算实现"单向函数"：<br>
+      从私钥计算公钥容易，从公钥反推私钥在计算上不可行。</p>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>✍️ 交易签名流程</h3>
+      <p>① 发起方用<strong>私钥</strong>对交易数据生成数字签名<br>
+      ② 全网节点用发起方的<strong>公钥</strong>验证签名有效性<br>
+      ③ 验证通过 = 证明"这笔交易确实由私钥持有者发起"<br>
+      ④ <strong>无需信任</strong>：数学保证，不需要第三方背书</p>
+    </div>
+  </div>
+</div>
+<div class="card accent-blue" style="margin-top:20px;">
+  <h3>🔐 密钥层级：HD 钱包 (BIP32/BIP39/BIP44)</h3>
+  <div class="flow-row" style="justify-content:flex-start;font-size:13px;">
+    <div class="flow-box"><div class="label">助记词</div><div style="font-size:12px;">12/24 个<br>英文单词</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><div class="label">种子</div><div style="font-size:12px;">512 位<br>随机数</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><div class="label">主私钥</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><div class="label">子私钥</div><div style="font-size:12px;">几乎无限<br>个地址</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--text3);margin-top:8px;">一条助记词可以管理无限多个地址，现代钱包标配。</p>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 8: 区块与链式结构 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--accent2);">PART 2 · TECH</span>
+  <h2>区块链的数据结构</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>📦 区块结构</h3>
+      <table class="data-table" style="font-size:12px;">
+        <tr><th colspan="2">区块头（80 字节）</th></tr>
+        <tr><td>版本号</td><td>4 字节</td></tr>
+        <tr><td>前区块哈希</td><td>32 字节</td></tr>
+        <tr><td>默克尔根</td><td>32 字节</td></tr>
+        <tr><td>时间戳</td><td>4 字节</td></tr>
+        <tr><td>难度目标 (bits)</td><td>4 字节</td></tr>
+        <tr><td>随机数 (nonce)</td><td>4 字节</td></tr>
+        <tr><th colspan="2">区块体（可变）</th></tr>
+        <tr><td colspan="2">Coinbase 交易 + 普通交易列表</td></tr>
+      </table>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>🔗 链式结构</h3>
+      <div class="flow-row" style="flex-direction:column;align-items:stretch;font-size:12px;">
+        <div class="flow-box" style="display:flex;justify-content:space-between;"><span>区块 N-1</span><span>Hash: 0000...abc</span></div>
+        <span style="text-align:center;">⬇ prev_hash = 0000...abc</span>
+        <div class="flow-box" style="display:flex;justify-content:space-between;border-color:var(--accent);"><span>区块 N</span><span>Hash: 0000...def</span></div>
+        <span style="text-align:center;">⬇ prev_hash = 0000...def</span>
+        <div class="flow-box" style="display:flex;justify-content:space-between;"><span>区块 N+1</span><span>Hash: 0000...ghi</span></div>
+      </div>
+      <p style="font-size:12px;color:var(--text3);margin-top:12px;">任何区块的数据被篡改 → 其哈希改变 → 所有后续区块哈希无效 → 篡改成本随确认数指数级增长</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 9: 默克尔树与UTXO ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--accent2);">PART 2 · TECH</span>
+  <h2>默克尔树 & UTXO 模型</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>🌲 默克尔树 (Merkle Tree)</h3>
+      <p>将区块内所有交易两两哈希，逐层向上构建二叉树，最终汇总为一个<strong>默克尔根</strong>（32字节）。</p>
+      <div class="formula">          Merkle Root (H_ABCD)
+        /            \
+    H_AB              H_CD
+   /    \            /    \
+H_A    H_B        H_C    H_D
+ ↓      ↓          ↓      ↓
+TxA    TxB        TxC    TxD</div>
+      <p style="font-size:12px;color:var(--text3);">SPV 轻节点无需下载全部交易，仅凭默克尔路径即可验证某笔交易是否存在于区块中——这是轻钱包的核心原理。</p>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>💰 UTXO 模型</h3>
+      <p>比特币没有"账户余额"概念。每一笔钱都以<strong>未花费交易输出（UTXO）</strong>的形式存在。</p>
+      <div style="background:rgba(0,0,0,0.2);padding:16px;border-radius:8px;font-size:13px;margin-top:8px;">
+        <p>🏦 <strong>类比</strong>：你钱包里有不同面额的纸钞，每次付款选几张，找零给你一张新钞。UTXO 就是这些"纸钞"。</p>
+        <div class="formula" style="margin-top:12px;">输入 UTXO₁ (0.5 BTC)
+输入 UTXO₂ (0.3 BTC)
+         ↙
+→ 输出1: 接收者 (0.7 BTC)
+→ 输出2: 找零 (0.098 BTC)
+→ 矿工费: 0.002 BTC
+合计输入 0.8 = 合计输出 0.8 ✓</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 10: 共识机制 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--accent2);">PART 2 · TECH</span>
+  <h2>工作量证明（PoW）共识机制</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>⛏️ PoW 核心逻辑</h3>
+      <p>矿工不断改变区块头中的 <strong>nonce</strong> 值，计算区块头哈希，直到找到满足难度目标的哈希值：</p>
+      <div class="formula">SHA256(SHA256(区块头)) < 难度目标</div>
+      <p style="margin-top:8px;">难度目标动态调整：<strong>每 2016 个区块</strong>（约 2 周）调整一次，确保平均出块时间维持在 <strong>10 分钟</strong>。</p>
+    </div>
+    <div class="card accent-blue">
+      <h3>🔒 为什么 PoW 安全？</h3>
+      <p>① 攻击者需掌握全网 <strong>51% 以上</strong>算力才能双花<br>
+      ② 比特币全网算力相当于数百万台顶级 ASIC 矿机并行<br>
+      ③ 重写历史需要重新计算所有区块——耗电和硬件成本天文数字<br>
+      ④ <strong>博弈论</strong>：诚实挖矿的收益远超攻击收益</p>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>⚡ 最长链原则 (Nakamoto Consensus)</h3>
+      <p>当两个矿工同时发现有效区块时，产生<strong>临时分叉</strong>。节点默认选择累积工作量最多的链（通常是最长链）作为主链，被遗弃的区块称为"孤块"。</p>
+      <div class="formula">  链 A: [0]←[1]←[2]←[3a]←[4a]←[5a]  ← 最长，被接受
+  链 B: [0]←[1]←[2]←[3b]  ← 较短，被遗弃（孤块）</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 11: 挖矿与减半 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(59,130,246,0.15);color:var(--accent2);">PART 2 · TECH</span>
+  <h2>挖矿演进与减半机制</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>🖥️ 挖矿硬件演进</h3>
+      <div class="timeline" style="padding-left:30px;">
+        <div class="timeline-item" style="padding:10px 14px;margin-bottom:10px;">
+          <div class="timeline-year">2009-2010</div><h4>CPU 挖矿</h4><p>普通电脑即可参与，去中心化程度最高</p></div>
+        <div class="timeline-item" style="padding:10px 14px;margin-bottom:10px;">
+          <div class="timeline-year">2010-2013</div><h4>GPU 挖矿</h4><p>显卡并行计算优势明显，算力大幅提升</p></div>
+        <div class="timeline-item" style="padding:10px 14px;margin-bottom:10px;">
+          <div class="timeline-year">2013 至今</div><h4>ASIC 矿机</h4><p>专用集成电路，普通用户再无竞争力，矿场/矿池时代</p></div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-blue" style="margin-bottom:16px;">
+      <h3>📉 减半机制 (Halving)</h3>
+      <p>每 <strong>210,000 个区块</strong>（约 4 年），区块奖励减半。总供应量有限：<strong>约 2100 万枚</strong>，预计 2140 年全部挖出。</p>
+      <table class="data-table">
+        <tr><th>时期</th><th>区块奖励</th><th>累计产出</th></tr>
+        <tr><td>2009-2012</td><td>50 BTC</td><td>1050 万</td></tr>
+        <tr><td>2012-2016</td><td>25 BTC</td><td>1575 万</td></tr>
+        <tr><td>2016-2020</td><td>12.5 BTC</td><td>1837.5 万</td></tr>
+        <tr><td>2020-2024</td><td>6.25 BTC</td><td>1968.75 万</td></tr>
+        <tr><td>2024-2028</td><td style="color:var(--accent);">3.125 BTC</td><td>~2034 万</td></tr>
+        <tr><td colspan="2" style="color:var(--text3);">...最终趋近于 0，总量 ≈ 2100 万</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 12: 钱包类型 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--accent3);">PART 3 · CONCEPTS</span>
+  <h2>钱包：你的数字资产入口</h2>
+</div>
+<div class="card-grid grid-2">
+  <div class="card accent-green"><div class="card-icon">🌐</div>
+    <h3>热钱包 (Hot Wallet)</h3>
+    <p>始终联网，如交易所钱包、手机 App (Trust Wallet, MetaMask)。<br><br>
+    ✅ 交易方便快捷<br>
+    ⚠️ 私钥在线，存在被黑风险<br>
+    📌 适合：日常小额交易</p>
+  </div>
+  <div class="card accent-green"><div class="card-icon">🧊</div>
+    <h3>冷钱包 (Cold Wallet)</h3>
+    <p>永不联网，如硬件钱包 (Ledger, Trezor)、纸钱包。<br><br>
+    ✅ 极高安全性，免疫网络攻击<br>
+    ⚠️ 使用不便，物理保管要求高<br>
+    📌 适合：长期大额存储</p>
+  </div>
+  <div class="card accent-green"><div class="card-icon">🏦</div>
+    <h3>托管钱包</h3>
+    <p>私钥由第三方（交易所、托管机构）保管。<br><br>
+    ✅ 操作简单，丢失可找回<br>
+    ⚠️ "Not your keys, not your coins" — FTX 事件的教训<br>
+    📌 适合：新手入门</p>
+  </div>
+  <div class="card accent-green"><div class="card-icon">🧠</div>
+    <h3>多重签名钱包</h3>
+    <p>需要 M/N 个签名才能动用资金（如 2/3 多签）。<br><br>
+    ✅ 消除单点故障，适合组织管理<br>
+    ⚠️ 设置复杂，交易手续费更高<br>
+    📌 适合：DAO 金库、企业财务</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 13: 分叉 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--accent3);">PART 3 · CONCEPTS</span>
+  <h2>分叉：区块链的进化之路</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-green" style="margin-bottom:16px;">
+      <h3>🔀 软分叉 (Soft Fork)</h3>
+      <p>向<strong>后兼容</strong>的协议升级。旧节点仍能验证新区块，只是部分新功能不可用。</p>
+      <div style="background:rgba(0,0,0,0.2);padding:12px;border-radius:8px;font-size:13px;margin-top:8px;">
+        <strong>经典案例：SegWit（隔离见证）2017</strong><br>
+        • 将签名数据从交易中分离，扩大区块有效容量<br>
+        • 修复交易延展性漏洞，为闪电网络铺路<br>
+        • 约 1.8 MB 有效区块（1MB基础 + 3MB见证）</div>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-green" style="margin-bottom:16px;">
+      <h3>💥 硬分叉 (Hard Fork)</h3>
+      <p>向<strong>不兼容</strong>的协议变更。未升级的节点无法验证新区块，导致<strong>链永久分裂</strong>。</p>
+      <div style="background:rgba(0,0,0,0.2);padding:12px;border-radius:8px;font-size:13px;margin-top:8px;">
+        <strong>经典案例：</strong><br>
+        • <strong>BCH (Bitcoin Cash)</strong> · 2017.8 — 大区块派从 BTC 分裂<br>
+        • <strong>BSV (Bitcoin SV)</strong> · 2018.11 — 从 BCH 再次分裂<br>
+        • <strong>ETH/ETC</strong> · 2016.7 — The DAO 事件后分叉</div>
+    </div>
+  </div>
+</div>
+<div class="card accent-green" style="margin-top:16px;">
+  <h3>🎯 Taproot 升级（2021.11）— 比特币最重要的一次软分叉</h3>
+  <div class="two-col" style="margin-top:12px;font-size:13px;">
+    <div><p>🔐 <strong>Schnorr 签名</strong>：聚合签名提高效率，增强隐私</p></div>
+    <div><p>🌿 <strong>MAST</strong>：复杂脚本更高效、更私密</p></div>
+    <div><p>📜 <strong>Tapscript</strong>：更灵活的脚本语言</p></div>
+    <div><p>⚡ 为闪电网络和智能合约能力提供更好的基础</p></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 14: Layer2 扩容 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--accent3);">PART 3 · CONCEPTS</span>
+  <h2>Layer 2：扩容解决方案</h2>
+</div>
+<div class="two-col">
+  <div class="card accent-green" style="margin-bottom:16px;">
+    <h3>⚡ 闪电网络 (Lightning Network)</h3>
+    <p>比特币最主要的 Layer 2 方案，实现即时、低成本的微支付。</p>
+    <div style="font-size:13px;color:var(--text2);line-height:1.8;margin-top:8px;">
+      <p>🔗 <strong>支付通道</strong>：双方在链上锁定资金创建通道</p>
+      <p>🔄 <strong>链下交易</strong>：通道内无限次转账，无需上链</p>
+      <p>🔀 <strong>路由网络</strong>：通过中间节点找到支付路径</p>
+      <p>🔒 <strong>最终结算</strong>：关闭通道时在一笔交易中结算</p>
+    </div>
+    <p style="font-size:12px;color:var(--text3);margin-top:8px;">💰 手续费可低至 1 satoshi，确认时间 ≈ 秒级</p>
+  </div>
+  <div class="card accent-green" style="margin-bottom:16px;">
+    <h3>📊 主流 Layer 2 方案对比</h3>
+    <table class="data-table" style="font-size:12px;">
+      <tr><th>方案</th><th>类型</th><th>TPS</th><th>链</th></tr>
+      <tr><td>Lightning</td><td>状态通道</td><td>百万+</td><td>BTC</td></tr>
+      <tr><td>Optimism</td><td>Optimistic Rollup</td><td>~4000</td><td>ETH</td></tr>
+      <tr><td>Arbitrum</td><td>Optimistic Rollup</td><td>~4000</td><td>ETH</td></tr>
+      <tr><td>zkSync</td><td>ZK Rollup</td><td>~10000</td><td>ETH</td></tr>
+      <tr><td>StarkNet</td><td>ZK Rollup</td><td>~10000</td><td>ETH</td></tr>
+      <tr><td>Polygon</td><td>侧链</td><td>~7000</td><td>ETH</td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--text3);margin-top:8px;">BTC 主链约 7 TPS，Layer 2 可支撑全球级支付量。</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 15: 以太坊与智能合约 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--accent3);">PART 3 · CONCEPTS</span>
+  <h2>以太坊：可编程的区块链</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-green" style="margin-bottom:16px;">
+      <h3>💎 以太坊 vs 比特币</h3>
+      <table class="data-table" style="font-size:12px;">
+        <tr><th>特性</th><th>比特币</th><th>以太坊</th></tr>
+        <tr><td>定位</td><td>数字黄金/货币</td><td>世界计算机</td></tr>
+        <tr><td>脚本</td><td>有限，非图灵完备</td><td>图灵完备 (Solidity)</td></tr>
+        <tr><td>共识</td><td>PoW</td><td>PoS (2022.9合并后)</td></tr>
+        <tr><td>出块时间</td><td>~10 分钟</td><td>~12 秒</td></tr>
+        <tr><td>地址模型</td><td>UTXO</td><td>账户模型</td></tr>
+        <tr><td>供应量</td><td>2100 万（固定）</td><td>无上限，EIP-1559 后通缩</td></tr>
+      </table>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-green" style="margin-bottom:16px;">
+      <h3>📜 智能合约</h3>
+      <p>部署在区块链上的<strong>自执行代码</strong>，一旦部署不可修改，按照预设规则自动运行。</p>
+      <div class="formula" style="font-size:12px;">contract SimpleBank {
+    mapping(address => uint) public balances;
+
+    function deposit() public payable {
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint amount) public {
+        require(balances[msg.sender] >= amount);
+        balances[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
+    }
+}</div>
+      <p style="font-size:12px;color:var(--accent);margin-top:4px;">⚡ "Code is Law" — 但代码漏洞也导致 The DAO (2016, 360万ETH被盗) 等重大事故</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 16: DeFi 与 NFT ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--accent3);">PART 3 · CONCEPTS</span>
+  <h2>DeFi 去中心化金融 & NFT</h2>
+</div>
+<div class="two-col">
+  <div>
+    <div class="card accent-green" style="margin-bottom:16px;">
+      <h3>🏦 去中心化金融 (DeFi)</h3>
+      <p>通过智能合约重建传统金融服务，无需中介。</p>
+      <div style="font-size:13px;line-height:1.8;margin-top:8px;">
+        <p>🔄 <strong>DEX</strong>：Uniswap — AMM 自动做市商</p>
+        <p>🏦 <strong>借贷</strong>：Aave、Compound — 存币生息/超额抵押借贷</p>
+        <p>🪙 <strong>稳定币</strong>：DAI (超额抵押)、USDC/USDT (法币抵押)</p>
+        <p>📈 <strong>收益聚合</strong>：Yearn Finance — 自动寻找最优收益策略</p>
+        <p>🔗 <strong>跨链桥</strong>：资产在不同区块链间转移</p>
+      </div>
+      <p style="font-size:12px;color:var(--accent);margin-top:8px;">📊 DeFi TVL 峰值超 1800 亿美元 (2021)，2024年复苏中</p>
+    </div>
+  </div>
+  <div>
+    <div class="card accent-green" style="margin-bottom:16px;">
+      <h3>🎨 非同质化代币 (NFT)</h3>
+      <p>基于 ERC-721/ERC-1155 标准，每个代币独一无二。</p>
+      <div style="font-size:13px;line-height:1.8;margin-top:8px;">
+        <p>🖼️ <strong>数字艺术</strong>：Beeple《Everydays》6900万美元成交</p>
+        <p>🎮 <strong>游戏</strong>：Axie Infinity — 边玩边赚 (Play-to-Earn)</p>
+        <p>🏠 <strong>虚拟地产</strong>：Decentraland、The Sandbox</p>
+        <p>🎵 <strong>音乐</strong>：艺人直接面向粉丝销售作品</p>
+        <p>🆔 <strong>身份</strong>：ENS 域名、DID 去中心化身份</p>
+        <p>📜 <strong>RWA</strong>：现实资产代币化（房地产、债券、碳信用）</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 17: 比特币生态爆炸 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(16,185,129,0.15);color:var(--accent3);">PART 3 · CONCEPTS</span>
+  <h2>比特币生态大爆发（2023-2024）</h2>
+</div>
+<div class="card-grid grid-3">
+  <div class="card accent-green">
+    <div class="card-icon">🔸</div>
+    <h3>Ordinals 协议</h3>
+    <p>2023年1月 Casey Rodarmor 推出，利用 Taproot 升级将数据（图片、文本）铭刻到单个 satoshi 上。<br><br>
+    开启了比特币 NFT 时代，单日铭文量逾 40 万条。</p>
+  </div>
+  <div class="card accent-green">
+    <div class="card-icon">🧱</div>
+    <h3>BRC-20 代币标准</h3>
+    <p>2023年3月匿名开发者 @domodata 创建，在比特币上发行同质化代币的实验性标准。<br><br>
+    首发代币 ORDI 从零涨至超 10 亿美元市值，引领比特币 DeFi 浪潮。</p>
+  </div>
+  <div class="card accent-green">
+    <div class="card-icon">🟠</div>
+    <h3>Runes 符文协议</h3>
+    <p>Casey Rodarmor 的又一创新，替代 BRC-20 的更高效同质化代币协议。<br><br>
+    基于 UTXO 模型，在第四次减半区块同步上线，gas 成本更低。</p>
+  </div>
+  <div class="card accent-green">
+    <div class="card-icon">⚡</div>
+    <h3>闪电网络增长</h3>
+    <p>2024年闪电网络容量超 5000 BTC，节点数超 1.5 万。<br><br>
+    Nostr 社交协议集成闪电支付，AI 代理间微支付场景开始实验。</p>
+  </div>
+  <div class="card accent-green">
+    <div class="card-icon">📊</div>
+    <h3>比特币质押 (Babylon)</h3>
+    <p>Babylon 协议使 BTC 持有者可以将 BTC 质押到 PoS 链获得收益。<br><br>
+    远程质押技术——无需跨链桥，无需将 BTC 移出比特币网络。</p>
+  </div>
+  <div class="card accent-green">
+    <div class="card-icon">🔷</div>
+    <h3>BitVM & Rollup</h3>
+    <p>BitVM 实现比特币上的乐观验证，为比特币 ZK Rollup 提供可能。<br><br>
+    Citrea、BOB 等项目正在构建比特币 Rollup，将智能合约能力引入 BTC 生态。</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 18: 市场数据 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">PART 3 · DATA</span>
+  <h2>关键市场数据（截至 2024-2025）</h2>
+</div>
+<div class="stat-row" style="margin-bottom:32px;">
+  <div class="stat-card"><div class="stat-value">>$100K</div><div class="stat-label">BTC 历史新高 (2024.12)</div></div>
+  <div class="stat-card"><div class="stat-value">~$2T</div><div class="stat-label">比特币总市值</div></div>
+  <div class="stat-card"><div class="stat-value">~$3.5T</div><div class="stat-label">加密货币总市值</div></div>
+  <div class="stat-card"><div class="stat-value">~19.8M</div><div class="stat-label">已挖出 BTC（94.3%）</div></div>
+</div>
+<div class="card-grid grid-2">
+  <div class="card accent-orange">
+    <h3>🏛️ 机构持仓 Top 5</h3>
+    <table class="data-table" style="font-size:13px;">
+      <tr><th>机构</th><th>BTC 持仓</th><th>类型</th></tr>
+      <tr><td>BlackRock (IBIT)</td><td>~55 万+</td><td>现货 ETF</td></tr>
+      <tr><td>MicroStrategy</td><td>~44 万+</td><td>上市公司</td></tr>
+      <tr><td>Grayscale (GBTC)</td><td>~22 万+</td><td>信托/ETF</td></tr>
+      <tr><td>Fidelity (FBTC)</td><td>~20 万+</td><td>现货 ETF</td></tr>
+      <tr><td>美国政府</td><td>~20 万+</td><td>扣押资产</td></tr>
+    </table>
+  </div>
+  <div class="card accent-orange">
+    <h3>🌍 全球比特币采用</h3>
+    <div style="font-size:13px;line-height:1.8;">
+      <p>🇸🇻 <strong>萨尔瓦多</strong>：2021年成为首个法定货币国家</p>
+      <p>🇺🇸 <strong>美国</strong>：现货 ETF 获批，潜在战略储备讨论</p>
+      <p>🇭🇰 <strong>香港</strong>：2024年批准现货 ETF，成为亚洲加密中心</p>
+      <p>🇪🇺 <strong>欧盟</strong>：MiCA 监管框架 2024 年生效</p>
+      <p>🇯🇵 <strong>日本</strong>：Web3 国家战略，税收改革推进</p>
+      <p>🌐 <strong>全球</strong>：超 4.2 亿人持有加密货币（2023）</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 19: 未来展望 ==================== -->
+<div class="slide">
+<div class="slide-content">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(139,92,246,0.15);color:var(--accent4);">PART 4 · FUTURE</span>
+  <h2>未来展望：2025-2035</h2>
+</div>
+<div class="card-grid grid-3">
+  <div class="card accent-purple"><div class="card-icon">⚡</div>
+    <h3>扩容与Layer2成熟</h3>
+    <p>闪电网络成为主流支付基础设施；比特币 ZK Rollup 将使 BTC 支持复杂智能合约，媲美以太坊生态。</p>
+  </div>
+  <div class="card accent-purple"><div class="card-icon">🏛️</div>
+    <h3>全球监管框架成型</h3>
+    <p>MiCA（欧盟）、FIT21（美国）等法案为行业提供清晰合规路径。更多国家将 BTC 纳入战略储备资产。</p>
+  </div>
+  <div class="card accent-purple"><div class="card-icon">🤖</div>
+    <h3>AI × 区块链融合</h3>
+    <p>AI Agent 使用闪电网络进行微支付；去中心化算力市场（Render、Akash）；ZKML 实现链上 AI 推理验证。</p>
+  </div>
+  <div class="card accent-purple"><div class="card-icon">🏦</div>
+    <h3>传统金融全面融合</h3>
+    <p>CBDC 与公链互通；现实资产全链上代币化（股票、债券、房地产）；银行提供加密货币托管服务成为标配。</p>
+  </div>
+  <div class="card accent-purple"><div class="card-icon">🌐</div>
+    <h3>Web3 & 去中心化社会</h3>
+    <p>DID 去中心化身份成为互联网标准；DAO 成为主流的组织治理形式；数据主权回归用户。</p>
+  </div>
+  <div class="card accent-purple"><div class="card-icon">🔒</div>
+    <h3>抗量子密码学</h3>
+    <p>量子计算机威胁现有椭圆曲线密码。NIST 后量子密码标准已发布，区块链将逐步迁移到抗量子签名算法。</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 20: 总结 ==================== -->
+<div class="slide">
+<div class="slide-content" style="text-align:center;">
+<div class="section-header">
+  <span class="section-tag" style="background:rgba(247,147,26,0.15);color:var(--accent);">SUMMARY</span>
+  <h2>总结与思考</h2>
+</div>
+
+<div class="card-grid grid-2" style="margin-bottom:32px;text-align:left;">
+  <div class="card accent-orange">
+    <h3>💡 核心要点</h3>
+    <div style="font-size:14px;line-height:2;">
+      <p>🔹 比特币是密码朋克数十年思想和技术的集大成者</p>
+      <p>🔹 区块链通过密码学而非信任中介实现价值传递</p>
+      <p>🔹 PoW 共识 + 最长链原则提供了博弈论级别的安全保证</p>
+      <p>🔹 2100 万总量上限是货币稀缺性的终极承诺</p>
+      <p>🔹 从货币到平台，从 Layer1 到 Layer2，生态持续进化</p>
+    </div>
+  </div>
+  <div class="card accent-purple">
+    <h3>🔮 值得思考的问题</h3>
+    <div style="font-size:14px;line-height:2;">
+      <p>❓ 比特币会成为全球储备资产还是支付网络？</p>
+      <p>❓ 2140年全部挖完后，手续费能否维持网络安全？</p>
+      <p>❓ 隐私（ZKP）与监管（KYC/AML）如何平衡？</p>
+      <p>❓ 量子计算何时能威胁现有密码学？</p>
+      <p>❓ 区块链最终会像互联网一样无处不在且不可见吗？</p>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:40px;">
+  <div style="font-size:60px;margin-bottom:12px;">₿</div>
+  <p style="font-size:18px;font-weight:300;color:var(--text2);">
+    "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
+  </p>
+  <p style="font-size:14px;color:var(--text3);margin-top:8px;">
+    从对金融体系的无声抗议，到重塑全球金融的未来——<br>
+    比特币的故事，才刚刚开始。
+  </p>
+  <p style="font-size:12px;color:var(--text3);margin-top:24px;">感谢聆听 · 欢迎讨论</p>
+</div>
+</div>
+</div>
+
+</div><!-- end slides-container -->
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+
+function showSlide(index) {
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'prev');
+    if (i === index) s.classList.add('active');
+    else if (i < index) s.classList.add('prev');
+  });
+  document.getElementById('pageNum').textContent = `${index + 1} / ${totalSlides}`;
+  updateNavDots();
+  currentSlide = index;
+}
+
+function updateNavDots() {
+  const container = document.getElementById('navDots');
+  container.innerHTML = '';
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    dot.onclick = () => showSlide(i);
+    dot.title = `第 ${i+1} 页`;
+    container.appendChild(dot);
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1);
+}
+function prevSlide() {
+  if (currentSlide > 0) showSlide(currentSlide - 1);
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault(); nextSlide();
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault(); prevSlide();
+  } else if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+  else if (e.key === 'End') { e.preventDefault(); showSlide(totalSlides - 1); }
+});
+
+// Touch support
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+});
+
+// Initialize
+showSlide(0);
+</script>
+
+</body>
+</html>
